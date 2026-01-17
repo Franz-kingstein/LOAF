@@ -1,5 +1,9 @@
 import { getDatabase } from './db';
-import { generateId, todayDate } from '../utils/helpers';
+
+function generateId(): string {
+  // simple unique id generator (timestamp + random)
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
 
 export interface UserProfile {
   id: string;

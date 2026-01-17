@@ -3,6 +3,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
+import { OnboardingGate } from './src/components/OnboardingGate';
+import { initializeDatabase } from './src/index';
+import { useEffect } from 'react';
 
 const Tab = createBottomTabNavigator();
 
@@ -76,56 +79,68 @@ function TabIcon({ name, focused }: { name: keyof typeof EMOJI_ICONS; focused: b
   );
 }
 
+function MainNavigator() {
+  return (
+    <Tab.Navigator
+      id="BottomTabNavigator"
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: {
+          height: 64,
+          backgroundColor: COLORS.background,
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          paddingBottom: 8,
+          paddingTop: 8,
+          paddingHorizontal: 0,
+        },
+        tabBarItemStyle: {
+          flex: 1,
+          paddingVertical: 0,
+          marginHorizontal: 0,
+          paddingHorizontal: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500' as const,
+          marginTop: 4,
+          color: COLORS.textSecondary,
+        },
+        tabBarIconStyle: {
+          width: 28,
+          height: 28,
+          marginBottom: 0,
+          marginTop: 0,
+        },
+        tabBarActiveTintColor: COLORS.secondary,
+        tabBarInactiveTintColor: COLORS.inactiveIcon,
+        tabBarIcon: ({ focused }) => (
+          <TabIcon name={route.name as keyof typeof EMOJI_ICONS} focused={focused} />
+        ),
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="LogFood" component={LogFoodScreen} options={{ title: 'Log Food' }} />
+      <Tab.Screen name="Water" component={WaterScreen} options={{ title: 'Water' }} />
+      <Tab.Screen name="Insights" component={InsightsScreen} options={{ title: 'Insights' }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
+    </Tab.Navigator>
+  );
+}
+
 export default function App() {
+  useEffect(() => {
+    initializeDatabase().catch(console.error);
+  }, []);
+
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Tab.Navigator
-          id="BottomTabNavigator"
-          screenOptions={({ route }) => ({
-            headerShown: false,
-            tabBarStyle: {
-              height: 64,
-              backgroundColor: COLORS.background,
-              borderTopWidth: 0,
-              elevation: 0,
-              shadowOpacity: 0,
-              paddingBottom: 8,
-              paddingTop: 8,
-              paddingHorizontal: 0,
-            },
-            tabBarItemStyle: {
-              flex: 1,
-              paddingVertical: 0,
-              marginHorizontal: 0,
-              paddingHorizontal: 0,
-            },
-            tabBarLabelStyle: {
-              fontSize: 11,
-              fontWeight: '500' as const,
-              marginTop: 4,
-              color: COLORS.textSecondary,
-            },
-            tabBarIconStyle: {
-              width: 28,
-              height: 28,
-              marginBottom: 0,
-              marginTop: 0,
-            },
-            tabBarActiveTintColor: COLORS.secondary,
-            tabBarInactiveTintColor: COLORS.inactiveIcon,
-            tabBarIcon: ({ focused }) => (
-              <TabIcon name={route.name as keyof typeof EMOJI_ICONS} focused={focused} />
-            ),
-          })}
-        >
-          <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
-          <Tab.Screen name="LogFood" component={LogFoodScreen} options={{ title: 'Log Food' }} />
-          <Tab.Screen name="Water" component={WaterScreen} options={{ title: 'Water' }} />
-          <Tab.Screen name="Insights" component={InsightsScreen} options={{ title: 'Insights' }} />
-          <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
-        </Tab.Navigator>
-      </NavigationContainer>
+      <OnboardingGate>
+        <NavigationContainer>
+          <MainNavigator />
+        </NavigationContainer>
+      </OnboardingGate>
       <StatusBar />
     </SafeAreaProvider>
   );
