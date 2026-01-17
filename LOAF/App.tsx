@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
 import { OnboardingGate } from './src/components/OnboardingGate';
 import { initializeDatabase } from './src/index';
+import { LogFoodScreenComponent } from './src/screens/LogFoodScreenNew';
 import { useEffect } from 'react';
 
 const Tab = createBottomTabNavigator();
@@ -31,15 +32,6 @@ function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }}>
       <Text style={{ color: COLORS.textPrimary, fontSize: 24, fontWeight: 'bold' }}>Home</Text>
       <Text style={{ color: COLORS.textSecondary, marginTop: 8 }}>Welcome to LOAF</Text>
-    </View>
-  );
-}
-
-function LogFoodScreen() {
-  return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: COLORS.textPrimary, fontSize: 24, fontWeight: 'bold' }}>Log Food</Text>
-      <Text style={{ color: COLORS.textSecondary, marginTop: 8 }}>Add meals here</Text>
     </View>
   );
 }
@@ -121,7 +113,7 @@ function MainNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
-      <Tab.Screen name="LogFood" component={LogFoodScreen} options={{ title: 'Log Food' }} />
+      <Tab.Screen name="LogFood" component={LogFoodScreenComponent} options={{ title: 'Log Food' }} />
       <Tab.Screen name="Water" component={WaterScreen} options={{ title: 'Water' }} />
       <Tab.Screen name="Insights" component={InsightsScreen} options={{ title: 'Insights' }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
