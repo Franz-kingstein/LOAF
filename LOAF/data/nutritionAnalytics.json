@@ -1,0 +1,241 @@
+{
+  "nutritionAnalytics": {
+    "version": "1.0",
+    "micronutrients": [
+      {
+        "id": "micro_001",
+        "name": "Calcium",
+        "abbreviation": "Ca",
+        "unit": "mg",
+        "dailyValue": 1000,
+        "importance": "Essential for bone health and muscle function",
+        "sources": [
+          "Cheese",
+          "Milk",
+          "Yogurt",
+          "Leafy Greens",
+          "Almonds"
+        ],
+        "deficiencySymptoms": [
+          "Weak bones",
+          "Muscle cramps",
+          "Brittle nails"
+        ]
+      },
+      {
+        "id": "micro_002",
+        "name": "Iron",
+        "abbreviation": "Fe",
+        "unit": "mg",
+        "dailyValue": 8,
+        "importance": "Essential for oxygen transport in blood",
+        "sources": [
+          "Red Meat",
+          "Spinach",
+          "Lentils",
+          "Fortified Cereals",
+          "Beans"
+        ],
+        "deficiencySymptoms": [
+          "Fatigue",
+          "Weakness",
+          "Shortness of breath",
+          "Pale skin"
+        ]
+      },
+      {
+        "id": "micro_003",
+        "name": "Vitamin C",
+        "abbreviation": "C",
+        "unit": "mg",
+        "dailyValue": 75,
+        "importance": "Supports immune system and collagen formation",
+        "sources": [
+          "Orange",
+          "Kiwi",
+          "Bell Peppers",
+          "Strawberries",
+          "Broccoli"
+        ],
+        "deficiencySymptoms": [
+          "Weak immune system",
+          "Slow wound healing",
+          "Joint pain"
+        ]
+      },
+      {
+        "id": "micro_004",
+        "name": "Folate",
+        "abbreviation": "B9",
+        "unit": "µg",
+        "dailyValue": 400,
+        "importance": "Important for cell division and DNA synthesis",
+        "sources": [
+          "Spinach",
+          "Asparagus",
+          "Brussels Sprouts",
+          "Chickpeas",
+          "Avocado"
+        ],
+        "deficiencySymptoms": [
+          "Anemia",
+          "Birth defects",
+          "Fatigue"
+        ]
+      },
+      {
+        "id": "micro_005",
+        "name": "Vitamin D",
+        "abbreviation": "D",
+        "unit": "µg",
+        "dailyValue": 15,
+        "dailyValueInIU": 600,
+        "conversionFactor": "1 µg = 40 IU",
+        "importance": "Supports calcium absorption and bone health",
+        "sources": [
+          "Sunlight Exposure",
+          "Fatty Fish",
+          "Egg Yolks",
+          "Fortified Milk",
+          "Mushrooms"
+        ],
+        "deficiencySymptoms": [
+          "Weak bones",
+          "Muscle weakness",
+          "Fatigue",
+          "Osteoporosis risk"
+        ]
+      },
+      {
+        "id": "micro_006",
+        "name": "Sodium",
+        "abbreviation": "Na",
+        "unit": "mg",
+        "dailyValue": 2300,
+        "importance": "Maintains blood pressure and fluid balance",
+        "sources": [
+          "Table Salt",
+          "Processed Foods",
+          "Bread",
+          "Cheese"
+        ],
+        "excessSymptoms": [
+          "High blood pressure",
+          "Water retention",
+          "Heart disease risk"
+        ]
+      }
+    ],
+    "macronutrients": [
+      {
+        "id": "macro_001",
+        "name": "Protein",
+        "unit": "g",
+        "dailyValue": 50,
+        "caloriesPerGram": 4,
+        "importance": "Building blocks for muscles, enzymes, and hormones",
+        "recommendations": {
+          "sedentary": 0.8,
+          "moderate": 1.2,
+          "active": 1.6
+        }
+      },
+      {
+        "id": "macro_002",
+        "name": "Carbohydrates",
+        "unit": "g",
+        "dailyValue": 225,
+        "caloriesPerGram": 4,
+        "importance": "Primary energy source",
+        "recommendations": {
+          "lowCarb": "25% of calories",
+          "balanced": "45-65% of calories",
+          "highCarb": "60% of calories"
+        }
+      },
+      {
+        "id": "macro_003",
+        "name": "Fat",
+        "unit": "g",
+        "dailyValue": 78,
+        "caloriesPerGram": 9,
+        "importance": "Energy storage, hormone production, vitamin absorption",
+        "recommendations": {
+          "lowFat": "20-35% of calories",
+          "balanced": "20-35% of calories",
+          "highFat": "60% of calories"
+        }
+      },
+      {
+        "id": "macro_004",
+        "name": "Fiber",
+        "unit": "g",
+        "dailyValue": 25,
+        "caloriesPerGram": 0,
+        "importance": "Digestive health, blood sugar control",
+        "recommendations": {
+          "minimum": 25,
+          "optimal": 38
+        }
+      }
+    ],
+    "dietTypeProfiles": [
+      {
+        "dietType": "Balanced",
+        "macroDistribution": {
+          "protein": "25-30%",
+          "carbohydrates": "45-55%",
+          "fat": "20-30%"
+        },
+        "bestFor": "Healthy lifestyle and weight maintenance",
+        "restrictions": []
+      },
+      {
+        "dietType": "Keto",
+        "macroDistribution": {
+          "protein": "25%",
+          "carbohydrates": "5-10%",
+          "fat": "70-75%"
+        },
+        "bestFor": "Rapid weight loss and blood sugar control",
+        "restrictions": [
+          "Bread",
+          "Pasta",
+          "Rice",
+          "Sugar"
+        ]
+      },
+      {
+        "dietType": "Vegan",
+        "macroDistribution": {
+          "protein": "25-30%",
+          "carbohydrates": "50-60%",
+          "fat": "20-30%"
+        },
+        "bestFor": "Plant-based lifestyle",
+        "restrictions": [
+          "Meat",
+          "Fish",
+          "Dairy",
+          "Eggs",
+          "Honey"
+        ]
+      },
+      {
+        "dietType": "Paleo",
+        "macroDistribution": {
+          "protein": "30-35%",
+          "carbohydrates": "25-35%",
+          "fat": "35-40%"
+        },
+        "bestFor": "Natural whole foods",
+        "restrictions": [
+          "Grains",
+          "Legumes",
+          "Dairy",
+          "Processed Foods"
+        ]
+      }
+    ]
+  }
+}

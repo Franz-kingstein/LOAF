@@ -1,0 +1,82 @@
+{
+  "mealLogs": [
+    {
+      "logId": "log_001",
+      "userId": "user_001",
+      "date": "2026-01-15",
+      "mealType": "breakfast",
+      "meals": [
+        {
+          "mealId": "meal_001",
+          "foodId": "food_001",
+          "foodName": "Hot Tea (Garam Chai)",
+          "quantity": 200,
+          "quantityUnit": "ml",
+          "timestamp": "2026-01-15T07:30:00Z",
+          "nutrition": {
+            "calories": 32.28,
+            "protein": {
+              "value": 0.78,
+              "unit": "g"
+            },
+            "carbohydrates": {
+              "value": 5.16,
+              "unit": "g"
+            },
+            "fat": {
+              "value": 1.06,
+              "unit": "g"
+            },
+            "fiber": {
+              "value": 0.0,
+              "unit": "g"
+            },
+            "sugar": {
+              "value": 5.16,
+              "unit": "g"
+            },
+            "sodium": {
+              "value": 6.24,
+              "unit": "mg"
+            }
+          },
+          "notes": "Added honey"
+        }
+      ],
+      "dayDailyNutrition": {
+        "totalCalories": 2150,
+        "totalProtein": {
+          "value": 155,
+          "unit": "g"
+        },
+        "totalCarbohydrates": {
+          "value": 210,
+          "unit": "g"
+        },
+        "totalFat": {
+          "value": 65,
+          "unit": "g"
+        },
+        "totalFiber": {
+          "value": 32,
+          "unit": "g"
+        },
+        "totalSugar": {
+          "value": 45,
+          "unit": "g"
+        },
+        "totalSodium": {
+          "value": 2500,
+          "unit": "mg"
+        }
+      },
+      "nutritionVsTarget": {
+        "caloriePercentage": 107.5,
+        "proteinPercentage": 103.3,
+        "carbohydratePercentage": 105,
+        "fatPercentage": 108.3,
+        "fiberPercentage": 106.7
+      }
+    }
+  ]
+}
