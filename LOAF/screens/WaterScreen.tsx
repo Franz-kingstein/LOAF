@@ -3,6 +3,7 @@
  * Screen for tracking water intake
  */
 
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -18,19 +19,22 @@ export function WaterScreen() {
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: theme.spacing.lg,
-      paddingBottom: Math.max(insets.bottom, theme.spacing.xxl) + theme.spacing.lg,
+      paddingBottom:
+        Math.max(insets.bottom, theme.spacing.xxl) + theme.spacing.lg,
     },
     title: {
-      fontSize: theme.typography.sizes.h2,
-      fontWeight: theme.typography.weights.bold as any,
-      color: theme.colors.text.primary,
+      fontSize: theme.typography.h2.fontSize,
+      fontWeight: theme.typography.h2.fontWeight,
+      lineHeight: theme.typography.h2.lineHeight,
+      color: theme.colors.textPrimary,
       marginBottom: theme.spacing.md,
       textAlign: 'center',
     },
     subtitle: {
-      fontSize: theme.typography.sizes.body,
-      fontWeight: theme.typography.weights.regular as any,
-      color: theme.colors.text.secondary,
+      fontSize: theme.typography.body.fontSize,
+      fontWeight: theme.typography.body.fontWeight,
+      lineHeight: theme.typography.body.lineHeight,
+      color: theme.colors.textSecondary,
       textAlign: 'center',
     },
   });

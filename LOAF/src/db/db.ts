@@ -70,6 +70,17 @@ async function createTables(): Promise<void> {
         updated_at TEXT
       );
 
+      CREATE TABLE IF NOT EXISTS water_tracking_preferences (
+        id TEXT PRIMARY KEY,
+        daily_goal_ml INTEGER,
+        wake_up_time TEXT,
+        sleep_time TEXT,
+        reminder_interval_minutes INTEGER,
+        reminders_enabled INTEGER,
+        created_at TEXT,
+        updated_at TEXT
+      );
+
       CREATE INDEX IF NOT EXISTS idx_meal_logs_date ON meal_logs(date);
       CREATE INDEX IF NOT EXISTS idx_water_logs_date ON water_logs(date);
     `);

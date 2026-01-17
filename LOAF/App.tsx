@@ -2,24 +2,22 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, View } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
+import { useEffect, useState } from 'react';
 import { OnboardingGate } from './src/components/OnboardingGate';
 import { initializeDatabase } from './src/index';
-import { LogFoodScreenComponent } from './src/screens/LogFoodScreenNew';
-import { useEffect } from 'react';
+import { configureNotificationHandler, scheduleWaterReminders } from './src/utils/notificationService';
+import { ThemeProvider, COLORS } from './src/context/ThemeContext';
+import { HomeScreen } from './src/screens/HomeScreen';
+import { LogFoodScreen } from './src/screens/LogFoodScreen';
+import { WaterTrackingScreen } from './src/screens/WaterTrackingScreen';
+import { InsightsScreen } from './src/screens/InsightsScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
+import type { RootTabParamList } from './src/navigation/NavigationConfig';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
-const COLORS = {
-  background: '#000000',
-  primary: '#143109',
-  secondary: '#B5BFA1',
-  textPrimary: '#FFFFFF',
-  textSecondary: 'rgba(255,255,255,0.6)',
-  inactiveIcon: 'rgba(255,255,255,0.4)',
-};
-
-const EMOJI_ICONS: Record<string, string> = {
+const EMOJI_ICONS: Record<keyof RootTabParamList, string> = {
   Home: '🏠',
   LogFood: '🍽️',
   Water: '💧',
@@ -27,45 +25,9 @@ const EMOJI_ICONS: Record<string, string> = {
   Settings: '⚙️',
 };
 
-function HomeScreen() {
+function TabIcon({ name, focused }: { name: keyof RootTabParamList; focused: boolean }) {
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: COLORS.textPrimary, fontSize: 24, fontWeight: 'bold' }}>Home</Text>
-      <Text style={{ color: COLORS.textSecondary, marginTop: 8 }}>Welcome to LOAF</Text>
-    </View>
-  );
-}
-
-function WaterScreen() {
-  return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: COLORS.textPrimary, fontSize: 24, fontWeight: 'bold' }}>Water</Text>
-      <Text style={{ color: COLORS.textSecondary, marginTop: 8 }}>Track hydration</Text>
-    </View>
-  );
-}
-
-function InsightsScreen() {
-  return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: COLORS.textPrimary, fontSize: 24, fontWeight: 'bold' }}>Insights</Text>
-      <Text style={{ color: COLORS.textSecondary, marginTop: 8 }}>Analytics & trends</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ color: COLORS.textPrimary, fontSize: 24, fontWeight: 'bold' }}>Settings</Text>
-      <Text style={{ color: COLORS.textSecondary, marginTop: 8 }}>App preferences</Text>
-    </View>
-  );
-}
-
-function TabIcon({ name, focused }: { name: keyof typeof EMOJI_ICONS; focused: boolean }) {
-  return (
-    <Text style={{ fontSize: 22, color: focused ? COLORS.secondary : COLORS.inactiveIcon }}>
+    <Text style={{ fontSize: 22, color: focused ? COLORS.accent : COLORS.inactiveIcon }}>
       {EMOJI_ICONS[name]}
     </Text>
   );
@@ -80,7 +42,8 @@ function MainNavigator() {
         tabBarStyle: {
           height: 64,
           backgroundColor: COLORS.background,
-          borderTopWidth: 0,
+          borderTopWidth: 1,
+          borderTopColor: '#222222',
           elevation: 0,
           shadowOpacity: 0,
           paddingBottom: 8,
@@ -105,35 +68,69 @@ function MainNavigator() {
           marginBottom: 0,
           marginTop: 0,
         },
-        tabBarActiveTintColor: COLORS.secondary,
+        tabBarActiveTintColor: COLORS.accent,
         tabBarInactiveTintColor: COLORS.inactiveIcon,
         tabBarIcon: ({ focused }) => (
-          <TabIcon name={route.name as keyof typeof EMOJI_ICONS} focused={focused} />
+          <TabIcon name={route.name as keyof RootTabParamList} focused={focused} />
         ),
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
-      <Tab.Screen name="LogFood" component={LogFoodScreenComponent} options={{ title: 'Log Food' }} />
-      <Tab.Screen name="Water" component={WaterScreen} options={{ title: 'Water' }} />
+      <Tab.Screen name="LogFood" component={LogFoodScreen} options={{ title: 'Log Food' }} />
+      <Tab.Screen name="Water" component={WaterTrackingScreen} options={{ title: 'Water' }} />
       <Tab.Screen name="Insights" component={InsightsScreen} options={{ title: 'Insights' }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
     </Tab.Navigator>
   );
 }
 
+function AppNavigator() {
+  return (
+    <NavigationContainer>
+      <MainNavigator />
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
+  const [booting, setBooting] = useState(true);
+
   useEffect(() => {
-    initializeDatabase().catch(console.error);
+    const initializeApp = async () => {
+      try {
+        // Initialize database first so downstream hooks can query safely
+        await initializeDatabase();
+
+        // Configure notifications and schedule reminders
+        await configureNotificationHandler();
+        await scheduleWaterReminders();
+
+        console.log('✅ App initialized successfully');
+      } catch (error) {
+        console.error('Error initializing app:', error);
+      } finally {
+        setBooting(false);
+      }
+    };
+
+    initializeApp();
   }, []);
 
   return (
     <SafeAreaProvider>
-      <OnboardingGate>
-        <NavigationContainer>
-          <MainNavigator />
-        </NavigationContainer>
-      </OnboardingGate>
-      <StatusBar />
+      <ThemeProvider>
+        {booting ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={COLORS.accent} />
+            <Text style={{ marginTop: 12, color: COLORS.textSecondary }}>Preparing LOAF…</Text>
+          </View>
+        ) : (
+          <OnboardingGate>
+            <AppNavigator />
+          </OnboardingGate>
+        )}
+        <StatusBar />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,241 +1,109 @@
 {
-  "nutritionAnalytics": {
-    "version": "1.0",
-    "micronutrients": [
-      {
-        "id": "micro_001",
-        "name": "Calcium",
-        "abbreviation": "Ca",
-        "unit": "mg",
-        "dailyValue": 1000,
-        "importance": "Essential for bone health and muscle function",
-        "sources": [
-          "Cheese",
-          "Milk",
-          "Yogurt",
-          "Leafy Greens",
-          "Almonds"
-        ],
-        "deficiencySymptoms": [
-          "Weak bones",
-          "Muscle cramps",
-          "Brittle nails"
-        ]
-      },
-      {
-        "id": "micro_002",
-        "name": "Iron",
-        "abbreviation": "Fe",
-        "unit": "mg",
-        "dailyValue": 8,
-        "importance": "Essential for oxygen transport in blood",
-        "sources": [
-          "Red Meat",
-          "Spinach",
-          "Lentils",
-          "Fortified Cereals",
-          "Beans"
-        ],
-        "deficiencySymptoms": [
-          "Fatigue",
-          "Weakness",
-          "Shortness of breath",
-          "Pale skin"
-        ]
-      },
-      {
-        "id": "micro_003",
-        "name": "Vitamin C",
-        "abbreviation": "C",
-        "unit": "mg",
-        "dailyValue": 75,
-        "importance": "Supports immune system and collagen formation",
-        "sources": [
-          "Orange",
-          "Kiwi",
-          "Bell Peppers",
-          "Strawberries",
-          "Broccoli"
-        ],
-        "deficiencySymptoms": [
-          "Weak immune system",
-          "Slow wound healing",
-          "Joint pain"
-        ]
-      },
-      {
-        "id": "micro_004",
-        "name": "Folate",
-        "abbreviation": "B9",
-        "unit": "µg",
-        "dailyValue": 400,
-        "importance": "Important for cell division and DNA synthesis",
-        "sources": [
-          "Spinach",
-          "Asparagus",
-          "Brussels Sprouts",
-          "Chickpeas",
-          "Avocado"
-        ],
-        "deficiencySymptoms": [
-          "Anemia",
-          "Birth defects",
-          "Fatigue"
-        ]
-      },
-      {
-        "id": "micro_005",
-        "name": "Vitamin D",
-        "abbreviation": "D",
-        "unit": "µg",
-        "dailyValue": 15,
-        "dailyValueInIU": 600,
-        "conversionFactor": "1 µg = 40 IU",
-        "importance": "Supports calcium absorption and bone health",
-        "sources": [
-          "Sunlight Exposure",
-          "Fatty Fish",
-          "Egg Yolks",
-          "Fortified Milk",
-          "Mushrooms"
-        ],
-        "deficiencySymptoms": [
-          "Weak bones",
-          "Muscle weakness",
-          "Fatigue",
-          "Osteoporosis risk"
-        ]
-      },
-      {
-        "id": "micro_006",
-        "name": "Sodium",
-        "abbreviation": "Na",
-        "unit": "mg",
-        "dailyValue": 2300,
-        "importance": "Maintains blood pressure and fluid balance",
-        "sources": [
-          "Table Salt",
-          "Processed Foods",
-          "Bread",
-          "Cheese"
-        ],
-        "excessSymptoms": [
-          "High blood pressure",
-          "Water retention",
-          "Heart disease risk"
-        ]
-      }
-    ],
-    "macronutrients": [
-      {
-        "id": "macro_001",
-        "name": "Protein",
-        "unit": "g",
-        "dailyValue": 50,
-        "caloriesPerGram": 4,
-        "importance": "Building blocks for muscles, enzymes, and hormones",
-        "recommendations": {
-          "sedentary": 0.8,
-          "moderate": 1.2,
-          "active": 1.6
-        }
-      },
-      {
-        "id": "macro_002",
-        "name": "Carbohydrates",
-        "unit": "g",
-        "dailyValue": 225,
-        "caloriesPerGram": 4,
-        "importance": "Primary energy source",
-        "recommendations": {
-          "lowCarb": "25% of calories",
-          "balanced": "45-65% of calories",
-          "highCarb": "60% of calories"
-        }
-      },
-      {
-        "id": "macro_003",
-        "name": "Fat",
-        "unit": "g",
-        "dailyValue": 78,
-        "caloriesPerGram": 9,
-        "importance": "Energy storage, hormone production, vitamin absorption",
-        "recommendations": {
-          "lowFat": "20-35% of calories",
-          "balanced": "20-35% of calories",
-          "highFat": "60% of calories"
-        }
-      },
-      {
-        "id": "macro_004",
-        "name": "Fiber",
-        "unit": "g",
-        "dailyValue": 25,
-        "caloriesPerGram": 0,
-        "importance": "Digestive health, blood sugar control",
-        "recommendations": {
-          "minimum": 25,
-          "optimal": 38
-        }
-      }
-    ],
-    "dietTypeProfiles": [
-      {
-        "dietType": "Balanced",
-        "macroDistribution": {
-          "protein": "25-30%",
-          "carbohydrates": "45-55%",
-          "fat": "20-30%"
-        },
-        "bestFor": "Healthy lifestyle and weight maintenance",
-        "restrictions": []
-      },
-      {
-        "dietType": "Keto",
-        "macroDistribution": {
-          "protein": "25%",
-          "carbohydrates": "5-10%",
-          "fat": "70-75%"
-        },
-        "bestFor": "Rapid weight loss and blood sugar control",
-        "restrictions": [
-          "Bread",
-          "Pasta",
-          "Rice",
-          "Sugar"
-        ]
-      },
-      {
-        "dietType": "Vegan",
-        "macroDistribution": {
-          "protein": "25-30%",
-          "carbohydrates": "50-60%",
-          "fat": "20-30%"
-        },
-        "bestFor": "Plant-based lifestyle",
-        "restrictions": [
-          "Meat",
-          "Fish",
-          "Dairy",
-          "Eggs",
-          "Honey"
-        ]
-      },
-      {
-        "dietType": "Paleo",
-        "macroDistribution": {
-          "protein": "30-35%",
-          "carbohydrates": "25-35%",
-          "fat": "35-40%"
-        },
-        "bestFor": "Natural whole foods",
-        "restrictions": [
-          "Grains",
-          "Legumes",
-          "Dairy",
-          "Processed Foods"
-        ]
-      }
-    ]
+  "nutrients": {
+    "calories": {
+      "name": "Calories",
+      "unit": "kcal",
+      "description": "Energy unit that measures how much energy food provides. Essential for all bodily functions including breathing, circulation, and physical activity.",
+      "importance": "Critical",
+      "topSources": ["oils", "nuts", "grains", "meat", "dairy"]
+    },
+    "protein": {
+      "name": "Protein",
+      "unit": "g",
+      "description": "Macronutrient essential for building and repairing muscles, bones, skin, and other tissues. Also supports immune function and enzyme production.",
+      "importance": "Critical",
+      "topSources": ["chicken", "beef", "eggs", "fish", "legumes", "dairy"]
+    },
+    "carbs": {
+      "name": "Carbohydrates",
+      "unit": "g",
+      "description": "Primary energy source for the brain and muscles. Provides quick and sustained energy. Includes both simple sugars and complex carbohydrates.",
+      "importance": "Critical",
+      "topSources": ["grains", "fruits", "vegetables", "legumes", "dairy"]
+    },
+    "fat": {
+      "name": "Fat",
+      "unit": "g",
+      "description": "Essential for absorbing fat-soluble vitamins (A, D, E, K), hormone production, and brain health. Provides more energy per gram than carbs or protein.",
+      "importance": "Critical",
+      "topSources": ["oils", "nuts", "seeds", "avocado", "fatty fish", "meat"]
+    },
+    "fiber": {
+      "name": "Fiber",
+      "unit": "g",
+      "description": "Indigestible carbohydrate that supports digestive health, helps regulate blood sugar, and promotes satiety. Reduces risk of heart disease and certain cancers.",
+      "importance": "Important",
+      "topSources": ["whole grains", "vegetables", "fruits", "legumes", "nuts", "seeds"]
+    },
+    "iron": {
+      "name": "Iron",
+      "unit": "mg",
+      "description": "Mineral essential for transporting oxygen throughout the body via hemoglobin in blood. Prevents anemia and supports energy metabolism.",
+      "importance": "Important",
+      "topSources": ["red meat", "poultry", "seafood", "legumes", "spinach", "fortified cereals"]
+    },
+    "calcium": {
+      "name": "Calcium",
+      "unit": "mg",
+      "description": "Major mineral for building and maintaining strong bones and teeth. Essential for muscle contraction, nerve transmission, and blood clotting.",
+      "importance": "Critical",
+      "topSources": ["dairy products", "leafy greens", "fortified plant milks", "sardines", "almonds"]
+    },
+    "vitaminD": {
+      "name": "Vitamin D",
+      "unit": "µg",
+      "description": "Fat-soluble vitamin that regulates calcium absorption, supports bone health, and strengthens immune system. Produced by skin exposure to sunlight.",
+      "importance": "Important",
+      "topSources": ["fatty fish", "egg yolks", "fortified milk", "mushrooms", "fortified cereals"]
+    },
+    "vitaminC": {
+      "name": "Vitamin C",
+      "unit": "mg",
+      "description": "Water-soluble vitamin that supports immune function, collagen production, and iron absorption. Acts as an antioxidant to protect cells from damage.",
+      "importance": "Important",
+      "topSources": ["citrus fruits", "berries", "bell peppers", "broccoli", "kiwi", "tomatoes"]
+    },
+    "vitaminA": {
+      "name": "Vitamin A",
+      "unit": "µg",
+      "description": "Fat-soluble vitamin crucial for vision, immune function, and skin health. Plays role in cell growth and differentiation.",
+      "importance": "Important",
+      "topSources": ["sweet potatoes", "carrots", "spinach", "kale", "liver", "fortified cereals"]
+    },
+    "potassium": {
+      "name": "Potassium",
+      "unit": "mg",
+      "description": "Essential mineral that regulates blood pressure, supports heart function, and maintains proper muscle contraction and nerve transmission.",
+      "importance": "Important",
+      "topSources": ["bananas", "potatoes", "beans", "spinach", "avocado", "coconut water"]
+    },
+    "sodium": {
+      "name": "Sodium",
+      "unit": "mg",
+      "description": "Mineral that regulates fluid balance, blood pressure, and nerve function. Most people consume excess sodium; limit to less than 2,300mg daily.",
+      "importance": "Monitor",
+      "topSources": ["processed foods", "canned soups", "bread", "deli meats", "salty snacks"]
+    },
+    "magnesium": {
+      "name": "Magnesium",
+      "unit": "mg",
+      "description": "Mineral involved in 300+ biochemical reactions in the body. Supports muscle and nerve function, energy metabolism, and bone health.",
+      "importance": "Important",
+      "topSources": ["almonds", "spinach", "pumpkin seeds", "black beans", "oats", "dark chocolate"]
+    },
+    "zinc": {
+      "name": "Zinc",
+      "unit": "mg",
+      "description": "Trace mineral essential for immune function, wound healing, protein synthesis, and DNA formation. Supports taste and smell perception.",
+      "importance": "Important",
+      "topSources": ["oysters", "beef", "chicken", "cashews", "chickpeas", "pumpkin seeds"]
+    },
+    "omega3": {
+      "name": "Omega-3 Fatty Acids",
+      "unit": "mg",
+      "description": "Essential polyunsaturated fats that reduce inflammation, support heart and brain health, and regulate mood. Includes EPA, DHA, and ALA.",
+      "importance": "Important",
+      "topSources": ["fatty fish", "walnuts", "flaxseeds", "chia seeds", "algae supplements"]
+    }
   }
 }

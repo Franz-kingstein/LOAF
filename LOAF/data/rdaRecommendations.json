@@ -1,239 +1,134 @@
 {
-  "rdaRecommendations": {
-    "version": "1.0",
-    "lastUpdated": "2026-01-15",
-    "categories": [
-      {
-        "id": "rda_001",
-        "ageGroup": "Children (4-6 years)",
-        "gender": "All",
-        "dailyRequirements": {
-          "calories": 1400,
-          "protein": {
-            "value": 20,
-            "unit": "g"
-          },
-          "fat": {
-            "value": 30,
-            "unit": "g"
-          },
-          "carbohydrates": {
-            "value": 175,
-            "unit": "g"
-          },
-          "fiber": {
-            "value": 16,
-            "unit": "g"
-          },
-          "calcium": {
-            "value": 600,
-            "unit": "mg"
-          },
-          "iron": {
-            "value": 8,
-            "unit": "mg"
-          },
-          "sodium": {
-            "value": 1200,
-            "unit": "mg"
-          },
-          "potassium": {
-            "value": 2000,
-            "unit": "mg"
-          },
-          "vitaminD": {
-            "value": 10,
-            "unit": "µg",
-            "equivalentIU": 400
-          }
-        }
-      },
-      {
-        "id": "rda_002",
-        "ageGroup": "Adult Men (19-50 years)",
-        "gender": "Male",
-        "dailyRequirements": {
-          "calories": 2400,
-          "protein": {
-            "value": 60,
-            "unit": "g"
-          },
-          "fat": {
-            "value": 65,
-            "unit": "g"
-          },
-          "carbohydrates": {
-            "value": 300,
-            "unit": "g"
-          },
-          "fiber": {
-            "value": 38,
-            "unit": "g"
-          },
-          "calcium": {
-            "value": 1000,
-            "unit": "mg"
-          },
-          "iron": {
-            "value": 8,
-            "unit": "mg"
-          },
-          "sodium": {
-            "value": 2300,
-            "unit": "mg"
-          },
-          "potassium": {
-            "value": 3400,
-            "unit": "mg"
-          },
-          "vitaminD": {
-            "value": 15,
-            "unit": "µg",
-            "equivalentIU": 600
-          }
-        }
-      },
-      {
-        "id": "rda_003",
-        "ageGroup": "Adult Women (19-50 years)",
-        "gender": "Female",
-        "dailyRequirements": {
-          "calories": 2000,
-          "protein": {
-            "value": 50,
-            "unit": "g"
-          },
-          "fat": {
-            "value": 55,
-            "unit": "g"
-          },
-          "carbohydrates": {
-            "value": 250,
-            "unit": "g"
-          },
-          "fiber": {
-            "value": 25,
-            "unit": "g"
-          },
-          "calcium": {
-            "value": 1000,
-            "unit": "mg"
-          },
-          "iron": {
-            "value": 18,
-            "unit": "mg"
-          },
-          "sodium": {
-            "value": 2300,
-            "unit": "mg"
-          },
-          "potassium": {
-            "value": 2600,
-            "unit": "mg"
-          },
-          "vitaminD": {
-            "value": 15,
-            "unit": "µg",
-            "equivalentIU": 600
-          }
-        }
-      },
-      {
-        "id": "rda_004",
-        "ageGroup": "Senior (51+ years)",
-        "gender": "All",
-        "dailyRequirements": {
-          "calories": 2000,
-          "protein": {
-            "value": 50,
-            "unit": "g"
-          },
-          "fat": {
-            "value": 55,
-            "unit": "g"
-          },
-          "carbohydrates": {
-            "value": 250,
-            "unit": "g"
-          },
-          "fiber": {
-            "value": 30,
-            "unit": "g"
-          },
-          "calcium": {
-            "value": 1200,
-            "unit": "mg"
-          },
-          "iron": {
-            "value": 8,
-            "unit": "mg"
-          },
-          "sodium": {
-            "value": 2300,
-            "unit": "mg"
-          },
-          "potassium": {
-            "value": 3400,
-            "unit": "mg"
-          },
-          "vitaminD": {
-            "value": 20,
-            "unit": "µg",
-            "equivalentIU": 800
-          }
-        }
-      }
-    ],
-    "mealPlans": [
-      {
-        "planId": "plan_001",
-        "name": "Indian Balanced Diet Plan",
-        "dietType": "Balanced",
-        "duration": 7,
-        "dayPlan": {
-          "breakfast": [
-            {
-              "foodName": "Bread made in wheat",
-              "servingSize": 2,
-              "servingSizeUnit": "slices"
-            },
-            {
-              "foodName": "Kadhi",
-              "servingSize": 200,
-              "servingSizeUnit": "ml"
-            }
-          ],
-          "lunch": [
-            {
-              "foodName": "Brown Rice",
-              "servingSize": 150,
-              "servingSizeUnit": "g"
-            },
-            {
-              "foodName": "Cauliflower",
-              "servingSize": 150,
-              "servingSizeUnit": "g"
-            },
-            {
-              "foodName": "Dal",
-              "servingSize": 100,
-              "servingSizeUnit": "ml"
-            }
-          ],
-          "dinner": [
-            {
-              "foodName": "Brown Rice",
-              "servingSize": 150,
-              "servingSizeUnit": "g"
-            },
-            {
-              "foodName": "Baati",
-              "servingSize": 1,
-              "servingSizeUnit": "piece"
-            }
-          ]
-        }
-      }
-    ]
-  }
+  "recommendations": [
+    {
+      "ageGroup": "14-18",
+      "gender": "Female",
+      "calories": 2000,
+      "protein": 46,
+      "carbs": 275,
+      "fat": 65,
+      "fiber": 26,
+      "iron": 15,
+      "calcium": 1300,
+      "vitaminD_ug": 15,
+      "water_ml": 2700
+    },
+    {
+      "ageGroup": "14-18",
+      "gender": "Male",
+      "calories": 2800,
+      "protein": 59,
+      "carbs": 385,
+      "fat": 93,
+      "fiber": 38,
+      "iron": 11,
+      "calcium": 1300,
+      "vitaminD_ug": 15,
+      "water_ml": 3700
+    },
+    {
+      "ageGroup": "19-30",
+      "gender": "Female",
+      "calories": 2000,
+      "protein": 46,
+      "carbs": 275,
+      "fat": 65,
+      "fiber": 25,
+      "iron": 18,
+      "calcium": 1000,
+      "vitaminD_ug": 15,
+      "water_ml": 2700
+    },
+    {
+      "ageGroup": "19-30",
+      "gender": "Male",
+      "calories": 2500,
+      "protein": 56,
+      "carbs": 344,
+      "fat": 83,
+      "fiber": 38,
+      "iron": 8,
+      "calcium": 1000,
+      "vitaminD_ug": 15,
+      "water_ml": 3700
+    },
+    {
+      "ageGroup": "31-50",
+      "gender": "Female",
+      "calories": 1800,
+      "protein": 46,
+      "carbs": 247,
+      "fat": 60,
+      "fiber": 25,
+      "iron": 18,
+      "calcium": 1000,
+      "vitaminD_ug": 15,
+      "water_ml": 2700
+    },
+    {
+      "ageGroup": "31-50",
+      "gender": "Male",
+      "calories": 2500,
+      "protein": 56,
+      "carbs": 344,
+      "fat": 83,
+      "fiber": 38,
+      "iron": 8,
+      "calcium": 1000,
+      "vitaminD_ug": 15,
+      "water_ml": 3700
+    },
+    {
+      "ageGroup": "51-70",
+      "gender": "Female",
+      "calories": 1600,
+      "protein": 46,
+      "carbs": 220,
+      "fat": 53,
+      "fiber": 21,
+      "iron": 8,
+      "calcium": 1200,
+      "vitaminD_ug": 15,
+      "water_ml": 2700
+    },
+    {
+      "ageGroup": "51-70",
+      "gender": "Male",
+      "calories": 2000,
+      "protein": 56,
+      "carbs": 275,
+      "fat": 67,
+      "fiber": 30,
+      "iron": 8,
+      "calcium": 1200,
+      "vitaminD_ug": 15,
+      "water_ml": 3700
+    },
+    {
+      "ageGroup": "71+",
+      "gender": "Female",
+      "calories": 1600,
+      "protein": 46,
+      "carbs": 220,
+      "fat": 53,
+      "fiber": 21,
+      "iron": 8,
+      "calcium": 1200,
+      "vitaminD_ug": 20,
+      "water_ml": 2700
+    },
+    {
+      "ageGroup": "71+",
+      "gender": "Male",
+      "calories": 2000,
+      "protein": 56,
+      "carbs": 275,
+      "fat": 67,
+      "fiber": 30,
+      "iron": 8,
+      "calcium": 1200,
+      "vitaminD_ug": 20,
+      "water_ml": 3700
+    }
+  ]
 }

@@ -1,10 +1,11 @@
 /**
  * Navigation Configuration
- * Centralized navigation structure for the app
+ * This file is deprecated - use src/navigation/NavigationConfig.ts instead
+ * Kept for backward compatibility
  */
 
 import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
-import { colors, spacing, typography } from '../constants/theme';
+import { colors, spacing, typography } from '../src/constants/theme';
 
 /**
  * Tab navigation configuration
@@ -46,9 +47,9 @@ export const darkTabNavigatorTheme = {
   colors: {
     primary: colors.primary,
     background: colors.background,
-    card: colors.surface,
-    text: colors.text.primary,
-    border: colors.surface,
+    card: colors.cardBackground,
+    text: colors.textPrimary,
+    border: colors.divider,
     notification: colors.primary,
   },
 };
@@ -61,10 +62,10 @@ export const getTabScreenOptions = (): BottomTabNavigationOptions => ({
   headerShown: false,
   tabBarShowLabel: true,
   tabBarActiveTintColor: colors.primary,
-  tabBarInactiveTintColor: colors.text.secondary,
+  tabBarInactiveTintColor: colors.textSecondary,
   tabBarStyle: {
-    backgroundColor: colors.surface,
-    borderTopColor: colors.info,
+    backgroundColor: colors.cardBackground,
+    borderTopColor: colors.divider,
     borderTopWidth: 0.5,
     paddingBottom: spacing.sm,
     paddingTop: spacing.xs,
@@ -79,8 +80,8 @@ export const getTabScreenOptions = (): BottomTabNavigationOptions => ({
     paddingTop: spacing.sm,
   },
   tabBarLabelStyle: {
-    fontSize: typography.sizes.captionSmall,
-    fontWeight: typography.weights.medium as any,
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
     marginTop: 0,
     marginBottom: spacing.sm,
   },

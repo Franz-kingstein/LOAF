@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const COLORS = {
-  background: '#000000',
-  surface: '#0E0E0E',
-  primary: '#143109',
-  secondary: '#B5BFA1',
-  textPrimary: '#FFFFFF',
-  textSecondary: 'rgba(255,255,255,0.6)',
-  border: 'rgba(255,255,255,0.1)',
-};
+import { COLORS } from '../context/ThemeContext';
 
 const DIET_TYPES = ['Vegetarian', 'Egg', 'Non-vegetarian'];
 
@@ -78,9 +69,9 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     },
     input: {
       flex: 1,
-      backgroundColor: COLORS.surface,
+      backgroundColor: COLORS.inputBackground,
       borderWidth: 1,
-      borderColor: COLORS.border,
+      borderColor: COLORS.inputBorder,
       borderRadius: 8,
       paddingHorizontal: 16,
       paddingVertical: 12,
@@ -102,7 +93,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
       paddingVertical: 12,
       paddingHorizontal: 12,
       borderWidth: 1,
-      borderColor: COLORS.border,
+      borderColor: COLORS.inputBorder,
       borderRadius: 8,
       alignItems: 'center',
     },

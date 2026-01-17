@@ -7,7 +7,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text } from 'react-native';
-import { colors, spacing } from '../constants/theme';
+import { colors, spacing } from '../src/constants/theme';
 
 // Import screens
 import { HomeScreen } from '../screens/HomeScreen';

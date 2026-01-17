@@ -1,368 +1,92 @@
 {
-  "goalMappings": {
-    "version": "1.0",
-    "lastUpdated": "2026-01-15",
-    "description": "Maps health goals to specific nutrients for deterministic recommendations and AI prompt generation",
-    "mappings": [
-      {
-        "goalId": "goal_001",
-        "goalName": "Weight Loss",
-        "description": "Reduce body weight safely",
-        "keyNutrients": [
-          "fiber",
-          "protein",
-          "water"
-        ],
-        "targetMacros": {
-          "protein": "30%",
-          "carbohydrates": "35%",
-          "fat": "35%"
-        },
-        "calorieDeficit": "500 kcal/day",
-        "foodCategories": [
-          "vegetables",
-          "fruits",
-          "lean_protein",
-          "whole_grains"
-        ],
-        "avoidCategories": [
-          "desserts",
-          "fried_foods",
-          "sugary_drinks"
-        ],
-        "mealTiming": {
-          "breakfast": "08:00",
-          "lunch": "13:00",
-          "dinner": "19:00"
-        }
-      },
-      {
-        "goalId": "goal_002",
-        "goalName": "Muscle Building",
-        "description": "Build lean muscle mass",
-        "keyNutrients": [
-          "protein",
-          "creatine",
-          "iron",
-          "zinc",
-          "magnesium"
-        ],
-        "targetMacros": {
-          "protein": "35%",
-          "carbohydrates": "45%",
-          "fat": "20%"
-        },
-        "proteinTargetPerKg": 1.6,
-        "foodCategories": [
-          "lean_protein",
-          "whole_grains",
-          "dairy",
-          "nuts_seeds"
-        ],
-        "mealFrequency": "5-6 meals per day"
-      },
-      {
-        "goalId": "goal_003",
-        "goalName": "Hair Growth & Health",
-        "description": "Strengthen hair and promote growth",
-        "keyNutrients": [
-          "protein",
-          "iron",
-          "zinc",
-          "biotin",
-          "vitamin_b12",
-          "folate",
-          "omega3"
-        ],
-        "targetMacros": {
-          "protein": "25%",
-          "carbohydrates": "50%",
-          "fat": "25%"
-        },
-        "micronutrientFocus": [
-          {
-            "nutrient": "iron",
-            "dailyTarget": 18,
-            "unit": "mg"
-          },
-          {
-            "nutrient": "zinc",
-            "dailyTarget": 11,
-            "unit": "mg"
-          },
-          {
-            "nutrient": "biotin",
-            "dailyTarget": 30,
-            "unit": "µg"
-          }
-        ],
-        "topFoods": [
-          "spinach",
-          "eggs",
-          "almonds",
-          "salmon",
-          "lentils",
-          "chicken",
-          "walnuts"
-        ]
-      },
-      {
-        "goalId": "goal_004",
-        "goalName": "Vitamin D Boost",
-        "description": "Increase vitamin D levels",
-        "keyNutrients": [
-          "vitamin_d",
-          "calcium",
-          "phosphorus"
-        ],
-        "targetMacros": {
-          "protein": "20%",
-          "carbohydrates": "55%",
-          "fat": "25%"
-        },
-        "micronutrientFocus": [
-          {
-            "nutrient": "vitamin_d",
-            "dailyTarget": 25,
-            "unit": "µg",
-            "notes": "400 IU minimum, 1000 IU optimal"
-          },
-          {
-            "nutrient": "calcium",
-            "dailyTarget": 1000,
-            "unit": "mg"
-          }
-        ],
-        "sunExposure": "20-30 minutes daily",
-        "topFoods": [
-          "fatty_fish",
-          "egg_yolks",
-          "fortified_milk",
-          "mushrooms",
-          "cheese"
-        ]
-      },
-      {
-        "goalId": "goal_005",
-        "goalName": "Energy & Stamina",
-        "description": "Increase energy levels and endurance",
-        "keyNutrients": [
-          "carbohydrates",
-          "iron",
-          "b_vitamins",
-          "magnesium",
-          "copper"
-        ],
-        "targetMacros": {
-          "protein": "20%",
-          "carbohydrates": "60%",
-          "fat": "20%"
-        },
-        "mealTiming": "Carbs 1-2 hours before activity",
-        "topFoods": [
-          "oats",
-          "brown_rice",
-          "banana",
-          "dates",
-          "honey",
-          "sweet_potato",
-          "beans"
-        ]
-      },
-      {
-        "goalId": "goal_006",
-        "goalName": "Bone Health",
-        "description": "Strengthen bones and prevent osteoporosis",
-        "keyNutrients": [
-          "calcium",
-          "vitamin_d",
-          "magnesium",
-          "phosphorus",
-          "vitamin_k"
-        ],
-        "targetMacros": {
-          "protein": "20%",
-          "carbohydrates": "55%",
-          "fat": "25%"
-        },
-        "micronutrientFocus": [
-          {
-            "nutrient": "calcium",
-            "dailyTarget": 1200,
-            "unit": "mg"
-          },
-          {
-            "nutrient": "vitamin_d",
-            "dailyTarget": 25,
-            "unit": "µg"
-          },
-          {
-            "nutrient": "magnesium",
-            "dailyTarget": 400,
-            "unit": "mg"
-          }
-        ],
-        "topFoods": [
-          "dairy",
-          "leafy_greens",
-          "almonds",
-          "sardines",
-          "broccoli",
-          "fortified_milk"
-        ]
-      },
-      {
-        "goalId": "goal_007",
-        "goalName": "Immune System Boost",
-        "description": "Strengthen immunity and fight infections",
-        "keyNutrients": [
-          "vitamin_c",
-          "vitamin_d",
-          "zinc",
-          "selenium",
-          "iron",
-          "folate"
-        ],
-        "targetMacros": {
-          "protein": "25%",
-          "carbohydrates": "50%",
-          "fat": "25%"
-        },
-        "micronutrientFocus": [
-          {
-            "nutrient": "vitamin_c",
-            "dailyTarget": 90,
-            "unit": "mg"
-          },
-          {
-            "nutrient": "zinc",
-            "dailyTarget": 11,
-            "unit": "mg"
-          }
-        ],
-        "topFoods": [
-          "citrus_fruits",
-          "berries",
-          "leafy_greens",
-          "garlic",
-          "ginger",
-          "turmeric",
-          "almonds",
-          "chicken"
-        ]
-      },
-      {
-        "goalId": "goal_008",
-        "goalName": "Digestive Health",
-        "description": "Improve digestion and gut health",
-        "keyNutrients": [
-          "fiber",
-          "water",
-          "probiotics",
-          "magnesium",
-          "ginger",
-          "turmeric"
-        ],
-        "targetMacros": {
-          "protein": "20%",
-          "carbohydrates": "60%",
-          "fat": "20%"
-        },
-        "fiberTarget": 38,
-        "waterTarget": "2-3 liters/day",
-        "topFoods": [
-          "whole_grains",
-          "vegetables",
-          "fruits",
-          "yogurt",
-          "legumes",
-          "prunes",
-          "ginger",
-          "turmeric"
-        ]
-      },
-      {
-        "goalId": "goal_009",
-        "goalName": "Skin Health",
-        "description": "Improve skin quality and glow",
-        "keyNutrients": [
-          "vitamin_c",
-          "vitamin_e",
-          "zinc",
-          "selenium",
-          "omega3",
-          "collagen_precursors"
-        ],
-        "targetMacros": {
-          "protein": "25%",
-          "carbohydrates": "45%",
-          "fat": "30%"
-        },
-        "micronutrientFocus": [
-          {
-            "nutrient": "vitamin_c",
-            "dailyTarget": 90,
-            "unit": "mg"
-          },
-          {
-            "nutrient": "zinc",
-            "dailyTarget": 11,
-            "unit": "mg"
-          }
-        ],
-        "topFoods": [
-          "citrus_fruits",
-          "berries",
-          "almonds",
-          "fatty_fish",
-          "olive_oil",
-          "tomatoes",
-          "spinach"
-        ]
-      },
-      {
-        "goalId": "goal_010",
-        "goalName": "Blood Sugar Control",
-        "description": "Manage blood sugar levels",
-        "keyNutrients": [
-          "fiber",
-          "chromium",
-          "magnesium",
-          "inositol"
-        ],
-        "targetMacros": {
-          "protein": "25%",
-          "carbohydrates": "40%",
-          "fat": "35%"
-        },
-        "lowGlycemicFoods": true,
-        "fiberTarget": 40,
-        "topFoods": [
-          "whole_grains",
-          "legumes",
-          "non_starchy_vegetables",
-          "nuts",
-          "berries"
-        ],
-        "avoidFoods": [
-          "refined_grains",
-          "sugary_drinks",
-          "processed_foods",
-          "desserts"
-        ]
+  "mappings": [
+    {
+      "goalId": "muscle_gain",
+      "goalName": "Muscle Gain",
+      "keyNutrients": ["protein", "calories", "carbs"],
+      "topFoods": ["chicken breast", "eggs", "Greek yogurt", "salmon", "beef"],
+      "targetMacros": {
+        "protein": 2.2,
+        "carbs": 4.0,
+        "fat": 0.8
       }
-    ],
-    "nutrientIndexMap": {
-      "protein": ["goal_002", "goal_003", "goal_005", "goal_007", "goal_009"],
-      "carbohydrates": ["goal_005", "goal_008"],
-      "fiber": ["goal_001", "goal_008", "goal_010"],
-      "vitamin_c": ["goal_004", "goal_007", "goal_009"],
-      "vitamin_d": ["goal_004", "goal_006", "goal_007"],
-      "calcium": ["goal_004", "goal_006"],
-      "iron": ["goal_003", "goal_005", "goal_007"],
-      "zinc": ["goal_003", "goal_007", "goal_009"],
-      "magnesium": ["goal_005", "goal_006", "goal_010"],
-      "omega3": ["goal_009"]
+    },
+    {
+      "goalId": "weight_loss",
+      "goalName": "Weight Loss",
+      "keyNutrients": ["fiber", "protein", "water"],
+      "topFoods": ["broccoli", "chicken breast", "beans", "spinach", "berries"],
+      "targetMacros": {
+        "protein": 2.0,
+        "carbs": 2.5,
+        "fat": 0.6
+      }
+    },
+    {
+      "goalId": "general_health",
+      "goalName": "General Health",
+      "keyNutrients": ["protein", "fiber", "calcium", "iron"],
+      "topFoods": ["whole grains", "vegetables", "lean protein", "fruits", "nuts"],
+      "targetMacros": {
+        "protein": 1.6,
+        "carbs": 3.5,
+        "fat": 0.8
+      }
+    },
+    {
+      "goalId": "energy_boost",
+      "goalName": "Energy & Stamina",
+      "keyNutrients": ["calories", "carbs", "iron"],
+      "topFoods": ["oats", "bananas", "sweet potatoes", "brown rice", "quinoa"],
+      "targetMacros": {
+        "protein": 1.6,
+        "carbs": 5.0,
+        "fat": 0.8
+      }
+    },
+    {
+      "goalId": "heart_health",
+      "goalName": "Heart Health",
+      "keyNutrients": ["fiber", "potassium", "omega3"],
+      "topFoods": ["salmon", "almonds", "beans", "oats", "olive oil"],
+      "targetMacros": {
+        "protein": 1.4,
+        "carbs": 3.5,
+        "fat": 0.7
+      }
+    },
+    {
+      "goalId": "bone_strength",
+      "goalName": "Bone Strength",
+      "keyNutrients": ["calcium", "vitaminD", "protein"],
+      "topFoods": ["milk", "yogurt", "cheese", "leafy greens", "salmon"],
+      "targetMacros": {
+        "protein": 1.6,
+        "carbs": 3.0,
+        "fat": 0.8
+      }
+    },
+    {
+      "goalId": "immune_support",
+      "goalName": "Immune Support",
+      "keyNutrients": ["vitaminC", "zinc", "protein"],
+      "topFoods": ["citrus fruits", "bell peppers", "garlic", "ginger", "mushrooms"],
+      "targetMacros": {
+        "protein": 1.6,
+        "carbs": 3.5,
+        "fat": 0.8
+      }
+    },
+    {
+      "goalId": "brain_health",
+      "goalName": "Brain Health",
+      "keyNutrients": ["omega3", "antioxidants", "protein"],
+      "topFoods": ["walnuts", "blueberries", "dark chocolate", "fish", "leafy greens"],
+      "targetMacros": {
+        "protein": 1.6,
+        "carbs": 3.5,
+        "fat": 1.0
+      }
     }
-  }
+  ]
 }

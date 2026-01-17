@@ -5,7 +5,7 @@
  */
 
 import { createContext, useContext } from 'react';
-import { colors, spacing, typography, borderRadius, shadows } from '../constants/theme';
+import { colors, spacing, typography, borderRadius, shadows } from '../src/constants/theme';
 
 export type Theme = {
   colors: typeof colors;
