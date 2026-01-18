@@ -20,6 +20,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.loaf.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
@@ -28,6 +29,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8de29483-c74d-47b7-bfd0-c8b2aa8fa9d4"
+      }
     }
   }
 }

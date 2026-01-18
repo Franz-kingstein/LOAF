@@ -12,12 +12,15 @@ import { COLORS } from '../context/ThemeContext';
 import { getTodayWaterTotal } from '../db/waterRepo';
 import { getTodaySummary } from '../db/summaryRepo';
 import { getUserProfile } from '../db/userRepo';
+import { ensureFitnessPermissions, getTodayFitnessSummary, isAuthorized, GOOGLE_CLIENT_ID } from '../services/fitness';
 
 export function HomeScreen(): React.ReactElement {
   const [loading, setLoading] = useState(true);
   const [todayWater, setTodayWater] = useState(0);
   const [todayNutrition, setTodayNutrition] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [fitness, setFitness] = useState<{ steps: number; activeMinutes: number } | null>(null);
+  const [fitAuth, setFitAuth] = useState<boolean>(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -46,6 +49,26 @@ export function HomeScreen(): React.ReactElement {
     const interval = setInterval(loadData, 60000); // Refresh every minute
     return () => clearInterval(interval);
   }, [loadData]);
+
+  useEffect(() => {
+    // Try fetching fitness if authorized
+    (async () => {
+      if (isAuthorized()) {
+        const summary = await getTodayFitnessSummary();
+        setFitness(summary);
+        setFitAuth(true);
+      }
+    })();
+  }, []);
+
+  const handleConnectGoogleFit = useCallback(async () => {
+    const ok = await ensureFitnessPermissions();
+    setFitAuth(ok);
+    if (ok) {
+      const summary = await getTodayFitnessSummary();
+      setFitness(summary);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -127,6 +150,37 @@ export function HomeScreen(): React.ReactElement {
             </View>
           </View>
         )}
+
+        {/* Activity Summary (Google Fit) */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>🏃 Activity Today</Text>
+            {!fitAuth && (
+              <TouchableOpacity onPress={handleConnectGoogleFit}>
+                <Text style={{ color: COLORS.accent }}>Connect Google Fit</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {fitness ? (
+            <View style={styles.nutritionGrid}>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Steps</Text>
+                <Text style={styles.nutritionValue}>{fitness.steps}</Text>
+              </View>
+              <View style={styles.nutritionItem}>
+                <Text style={styles.nutritionLabel}>Active Minutes</Text>
+                <Text style={styles.nutritionValue}>{fitness.activeMinutes}</Text>
+              </View>
+            </View>
+          ) : (
+            <Text style={styles.cardSubtext}>
+              {fitAuth ? 'No activity data yet' : 'Grant permission to view activity'}
+            </Text>
+          )}
+          <Text style={styles.cardSubtext}>
+            Used to adjust calorie context only. No gamification or ranking.
+          </Text>
+        </View>
 
         {/* Quick Actions */}
         <View style={styles.actionsSection}>
