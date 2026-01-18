@@ -22,10 +22,10 @@ export async function signOutGoogle(): Promise<void> {
 
 export async function signInWithGoogle(): Promise<GoogleAuthState | null> {
   try {
-    const redirectUri = AuthSession.makeRedirectUri({ scheme: 'LOAF' });
+    const redirectUri = AuthSession.makeRedirectUri();
     const discovery = Google.discovery;
     const request = new AuthSession.AuthRequest({
-  clientId: '229104397794-4055r0jsp7mqbcmpdqaj50sn53ojt0dj.apps.googleusercontent.com',
+      clientId: '229104397794-difor30551b64fqnf50e4jgv63vglhs8.apps.googleusercontent.com',
       redirectUri,
       responseType: AuthSession.ResponseType.Token,
       scopes: ['openid', 'email', 'profile'],

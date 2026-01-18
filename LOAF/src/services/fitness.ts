@@ -1,5 +1,6 @@
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import Constants from 'expo-constants';
 
 // Ensure auth session results are handled correctly on web
 WebBrowser.maybeCompleteAuthSession();
@@ -17,8 +18,11 @@ const GOOGLE_FIT_SCOPES = [
   'https://www.googleapis.com/auth/fitness.body.read',
 ];
 
-// Provided Android OAuth Client ID (Google Fit enabled)
-export const GOOGLE_CLIENT_ID = '229104397794-4055r0jsp7mqbcmpdqaj50sn53ojt0dj.apps.googleusercontent.com';
+// OAuth Client ID configured via app.json -> expo.extra.googleOAuthClientId
+// Fallback to a hardcoded ID if not provided (replace with your own client ID)
+export const GOOGLE_CLIENT_ID =
+  (Constants?.expoConfig as any)?.extra?.googleOAuthClientId ||
+  '229104397794-difor30551b64fqnf50e4jgv63vglhs8.apps.googleusercontent.com';
 
 // NOTE: You will need to provide a webClientId (OAuth client) from Google Cloud Console.
 // For now, we request using prompt; caller can pass client IDs.
@@ -29,19 +33,38 @@ export async function ensureFitnessPermissions(): Promise<boolean> {
       tokenEndpoint: 'https://oauth2.googleapis.com/token',
     };
 
+    // Use OAuth Code + PKCE (recommended) and explicit redirect URI tied to app scheme.
     const request = new AuthSession.AuthRequest({
-  clientId: GOOGLE_CLIENT_ID,
+      clientId: GOOGLE_CLIENT_ID,
       scopes: GOOGLE_FIT_SCOPES,
       redirectUri: AuthSession.makeRedirectUri(),
-      responseType: AuthSession.ResponseType.Token,
+      responseType: AuthSession.ResponseType.Code,
+      usePKCE: true,
+      extraParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     });
 
     await request.makeAuthUrlAsync(discovery);
     const result = await request.promptAsync(discovery);
 
-    if (result.type === 'success' && result.authentication?.accessToken) {
-      accessToken = result.authentication.accessToken;
-      return true;
+    if (result.type === 'success') {
+      // Exchange the code for tokens
+      const tokenRes = await AuthSession.exchangeCodeAsync(
+        {
+          code: result.params.code as string,
+          clientId: GOOGLE_CLIENT_ID,
+          redirectUri: request.redirectUri,
+          extraParams: { code_verifier: request.codeVerifier! },
+        },
+        discovery
+      );
+
+      if (tokenRes.accessToken) {
+        accessToken = tokenRes.accessToken;
+        return true;
+      }
     }
 
     return false;
@@ -65,7 +88,9 @@ function getEndOfDay(date: Date) {
 
 async function fitnessAggregate(from: Date, to: Date): Promise<FitnessSummary> {
   if (!accessToken) {
-    throw new Error('Google Fit not authorized');
+    // Not authorized; let caller handle a null result without noisy warnings
+    // Returning zeros avoids throwing during initial app load before authorization.
+    return { steps: 0, activeMinutes: 0 };
   }
 
   const body = {
@@ -120,7 +145,10 @@ export async function getTodayFitnessSummary(): Promise<FitnessSummary | null> {
     const end = getEndOfDay(now);
     return await fitnessAggregate(start, end);
   } catch (e) {
-    console.warn('Fitness summary fetch error:', e);
+    // Only warn when we have an access token and the API fails; otherwise stay quiet
+    if (accessToken) {
+      console.warn('Fitness summary fetch error:', e);
+    }
     return null;
   }
 }
