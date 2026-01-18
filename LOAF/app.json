@@ -12,8 +12,8 @@
       "expo-router"
     ],
     "splash": {
-      "image": "./assets/Logo.webp",
-      "resizeMode": "cover",
+      "image": "./assets/Logo.png",
+      "resizeMode": "contain",
       "backgroundColor": "#143109"
     },
     "ios": {
@@ -34,7 +34,8 @@
       "router": {},
       "eas": {
         "projectId": "8de29483-c74d-47b7-bfd0-c8b2aa8fa9d4"
-      }
+  },
+  "geminiApiKey": "GEMINI_API_KEY_PLACEHOLDER"
     }
   }
 }

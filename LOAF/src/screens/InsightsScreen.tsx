@@ -1,46 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { COLORS } from '../context/ThemeContext';
 import { getTotalWaterForDate } from '../db/waterRepo';
-import { todayDate, formatDate, parseDate } from '../utils/helpers';
+import { formatDate } from '../utils/helpers';
+import { getTodayFitnessSummary, ensureFitnessPermissions } from '../services/fitness';
 
 export function InsightsScreen(): React.ReactElement {
   const [loading, setLoading] = useState(true);
-  const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [waterToday, setWaterToday] = useState(0);
+  const [nutrients, setNutrients] = useState<{ label: string; value: number; target: number; unit: string }[]>([]);
+  const [activity, setActivity] = useState<{ steps: number; activeMinutes: number } | null>(null);
 
   useEffect(() => {
-    loadWeeklyData();
+    loadTodayData();
   }, []);
 
-  const loadWeeklyData = async () => {
+  const loadTodayData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const today = new Date();
-      const data = [];
+      const dateStr = formatDate(new Date());
+      const water = await getTotalWaterForDate(dateStr);
+      setWaterToday(water || 0);
 
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = formatDate(date);
-        const water = await getTotalWaterForDate(dateStr);
+      const exampleNutrients = [
+        { label: 'Protein', value: 42, target: 50, unit: 'g' },
+        { label: 'Fiber', value: 18, target: 25, unit: 'g' },
+        { label: 'Iron', value: 9, target: 14, unit: 'mg' },
+        { label: 'Vitamin C', value: 55, target: 75, unit: 'mg' },
+      ];
+      setNutrients(exampleNutrients);
 
-        data.push({
-          date: dateStr,
-          day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()],
-          water,
-        });
+      try {
+        await ensureFitnessPermissions();
+        const summary = await getTodayFitnessSummary();
+        if (summary) setActivity({ steps: summary.steps || 0, activeMinutes: summary.activeMinutes || 0 });
+      } catch {
+        setActivity(null);
       }
-
-      setWeeklyData(data);
-    } catch (error) {
-      console.error('Error loading weekly data:', error);
     } finally {
       setLoading(false);
     }
@@ -51,104 +47,73 @@ export function InsightsScreen(): React.ReactElement {
       <SafeAreaView style={styles.container}>
         <View style={styles.center}>
           <ActivityIndicator size="large" color={COLORS.accent} />
-          <Text style={styles.loadingText}>Loading insights...</Text>
+          <Text style={styles.loadingText}>Loading today’s summary…</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const avgWater = weeklyData.length
-    ? Math.round(weeklyData.reduce((sum, d) => sum + d.water, 0) / weeklyData.length)
-    : 0;
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>📊 Weekly Insights</Text>
-          <Text style={styles.subtitle}>Your 7-day overview</Text>
+          <Text style={styles.title}>Insights</Text>
+          <Text style={styles.subtitle}>Today’s overview for awareness</Text>
         </View>
 
-        {/* Water Stats */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>💧 Water Intake</Text>
-          <Text style={styles.statLabel}>Weekly Average</Text>
-          <Text style={styles.statValue}>{avgWater} ml</Text>
-
-          {/* Weekly Chart */}
-          <View style={styles.chartContainer}>
-            {weeklyData.map((item, index) => {
-              const maxWater = 3000;
-              const height = (item.water / maxWater) * 150;
-
-              return (
-                <View key={index} style={styles.chartItem}>
-                  <View
-                    style={[
-                      styles.chartBar,
-                      {
-                        height,
-                        backgroundColor:
-                          item.water >= 2500 ? COLORS.success : COLORS.accent,
-                      },
-                    ]}
-                  />
-                  <Text style={styles.chartLabel}>{item.day}</Text>
-                  <Text style={styles.chartValue}>{item.water}</Text>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Daily Breakdown */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>📋 Daily Breakdown</Text>
-          {weeklyData.map((item, index) => (
-            <View key={index} style={styles.breakdownItem}>
-              <View style={styles.breakdownHeader}>
-                <Text style={styles.breakdownDay}>{item.day}</Text>
-                <Text style={styles.breakdownDate}>{item.date}</Text>
+          <Text style={styles.cardTitle}>Daily nutrients</Text>
+          {nutrients.map((n, idx) => (
+            <View key={idx} style={styles.metricBlock}>
+              <View style={styles.metricHeader}>
+                <Text style={styles.metricLabel}>{n.label}</Text>
+                <Text style={styles.metricValue}>{n.value} {n.unit}</Text>
               </View>
-              <View style={styles.breakdownBar}>
-                <View
-                  style={[
-                    styles.breakdownBarFill,
-                    {
-                      width: `${Math.min((item.water / 2500) * 100, 100)}%`,
-                      backgroundColor:
-                        item.water >= 2500 ? COLORS.success : COLORS.accent,
-                    },
-                  ]}
-                />
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${Math.min((n.value / n.target) * 100, 100)}%`, backgroundColor: COLORS.accent }]} />
               </View>
-              <Text style={styles.breakdownValue}>{item.water} ml / 2500 ml</Text>
+              <Text style={styles.metricTarget}>Target: {n.target} {n.unit}</Text>
             </View>
           ))}
         </View>
 
-        {/* Summary */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>📈 Summary</Text>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Days Met Goal:</Text>
-            <Text style={styles.summaryValue}>
-              {weeklyData.filter((d) => d.water >= 2500).length}/7
-            </Text>
+          <Text style={styles.cardTitle}>Water intake</Text>
+          <View style={styles.metricHeader}>
+            <Text style={styles.metricLabel}>Today</Text>
+            <Text style={styles.metricValue}>{waterToday} ml</Text>
           </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Total Water:</Text>
-            <Text style={styles.summaryValue}>
-              {weeklyData.reduce((sum, d) => sum + d.water, 0)} ml
-            </Text>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: `${Math.min((waterToday / 2500) * 100, 100)}%`, backgroundColor: COLORS.accent }]} />
           </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Highest Day:</Text>
-            <Text style={styles.summaryValue}>
-              {Math.max(...weeklyData.map((d) => d.water))} ml
-            </Text>
+          <Text style={styles.metricTarget}>Reference: 2500 ml</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Activity summary</Text>
+          <View style={styles.metricBlock}>
+            <View style={styles.metricHeader}>
+              <Text style={styles.metricLabel}>Steps</Text>
+              <Text style={styles.metricValue}>{activity?.steps ?? 0}</Text>
+            </View>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${Math.min(((activity?.steps ?? 0) / 8000) * 100, 100)}%`, backgroundColor: COLORS.accent }]} />
+            </View>
+            <Text style={styles.metricTarget}>Reference: 8,000</Text>
           </View>
+          <View style={styles.metricBlock}>
+            <View style={styles.metricHeader}>
+              <Text style={styles.metricLabel}>Active minutes</Text>
+              <Text style={styles.metricValue}>{activity?.activeMinutes ?? 0}</Text>
+            </View>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${Math.min(((activity?.activeMinutes ?? 0) / 30) * 100, 100)}%`, backgroundColor: COLORS.accent }]} />
+            </View>
+            <Text style={styles.metricTarget}>Reference: 30</Text>
+          </View>
+          {!activity && (
+            <Text style={styles.explainer}>Connect activity to see today’s steps and active minutes.</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -178,8 +143,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '600',
     color: COLORS.textPrimary,
     marginBottom: 4,
   },
@@ -201,90 +166,41 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginBottom: 16,
   },
-  statLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
+  metricBlock: {
+    marginBottom: 12,
   },
-  statValue: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: COLORS.accent,
-    marginBottom: 20,
-  },
-  chartContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    height: 200,
-    paddingVertical: 16,
-  },
-  chartItem: {
-    alignItems: 'center',
-  },
-  chartBar: {
-    width: 24,
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  chartLabel: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    marginBottom: 2,
-  },
-  chartValue: {
-    fontSize: 10,
-    color: COLORS.textSecondary,
-  },
-  breakdownItem: {
-    marginBottom: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#222222',
-  },
-  breakdownHeader: {
+  metricHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: 6,
   },
-  breakdownDay: {
+  metricLabel: {
     fontSize: 14,
-    fontWeight: '600',
     color: COLORS.textPrimary,
   },
-  breakdownDate: {
-    fontSize: 12,
+  metricValue: {
+    fontSize: 14,
     color: COLORS.textSecondary,
   },
-  breakdownBar: {
+  metricTarget: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  progressBar: {
     height: 8,
     backgroundColor: '#333333',
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 6,
   },
-  breakdownBarFill: {
+  progressFill: {
     height: '100%',
     borderRadius: 4,
   },
-  breakdownValue: {
+  explainer: {
     fontSize: 12,
     color: COLORS.textSecondary,
-  },
-  summaryItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#222222',
-  },
-  summaryLabel: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  summaryValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
+    marginTop: 8,
   },
 });

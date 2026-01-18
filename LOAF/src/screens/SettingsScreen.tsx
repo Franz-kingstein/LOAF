@@ -16,12 +16,14 @@ import {
   getOrCreateWaterPreferences,
   updateWaterPreferences,
 } from '../db/waterPreferencesRepo';
+import { getAuthState, signInWithGoogle, signOutGoogle } from '../services/googleAuth';
 
 export function SettingsScreen(): React.ReactElement {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [waterPrefs, setWaterPrefs] = useState<any>(null);
   const [editingUser, setEditingUser] = useState(false);
   const [editingWater, setEditingWater] = useState(false);
+  const [googleAuth, setGoogleAuth] = useState<any>(null);
 
   useEffect(() => {
     loadSettings();
@@ -34,6 +36,9 @@ export function SettingsScreen(): React.ReactElement {
 
       const prefs = await getOrCreateWaterPreferences();
       setWaterPrefs(prefs);
+
+  const auth = await getAuthState();
+  setGoogleAuth(auth);
     } catch (error) {
       console.error('Error loading settings:', error);
     }
@@ -80,6 +85,37 @@ export function SettingsScreen(): React.ReactElement {
         <View style={styles.header}>
           <Text style={styles.title}>⚙️ Settings</Text>
           <Text style={styles.subtitle}>Manage your preferences</Text>
+        </View>
+
+        {/* Optional Google Account */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>🔑 Account (optional)</Text>
+          </View>
+          <View style={styles.card}>
+            {googleAuth?.accessToken ? (
+              <>
+                <Text style={styles.value}>Signed in with Google</Text>
+                <TouchableOpacity style={styles.saveButton} onPress={async () => {
+                  await signOutGoogle();
+                  const auth = await getAuthState();
+                  setGoogleAuth(auth);
+                }}>
+                  <Text style={styles.saveButtonText}>Sign out</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.value}>You can sign in to enable backup & sync later. This is optional.</Text>
+                <TouchableOpacity style={styles.saveButton} onPress={async () => {
+                  const state = await signInWithGoogle();
+                  setGoogleAuth(state);
+                }}>
+                  <Text style={styles.saveButtonText}>Sign in with Google</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </View>
 
         {/* User Profile Section */}
@@ -289,7 +325,7 @@ export function SettingsScreen(): React.ReactElement {
           <View style={styles.card}>
             <Text style={styles.aboutText}>
               LOAF v1.0.0{'\n'}
-              Lifestyle Optimization & Activity Fusion{'\n\n'}
+              Logging Optimizer and Adviser of Food{'\n\n'}
               Track your nutrition and hydration for optimal health.
             </Text>
           </View>
