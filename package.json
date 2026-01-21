@@ -8,13 +8,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Franz-kingstein/LOAF.git"
+    "url": "git+https://github.com/franz2005/LOAF.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Franz-kingstein/LOAF/issues"
+    "url": "https://github.com/franz2005/LOAF/issues"
   },
-  "homepage": "https://github.com/Franz-kingstein/LOAF#readme"
+  "homepage": "https://github.com/franz2005/LOAF#readme",
+  "dependencies": {
+    "expo-build-properties": "~1.0.10",
+    "expo-constants": "~18.0.13",
+    "expo-image-picker": "^17.0.10",
+    "expo-linking": "~8.0.11"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.2"
+  }
 }

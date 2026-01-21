@@ -342,13 +342,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 24,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 20,
+    marginTop: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.textPrimary,
     marginBottom: 4,
@@ -358,16 +359,16 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: COLORS.textPrimary,
   },
@@ -384,18 +385,18 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#111111',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 14,
     borderWidth: 1,
     borderColor: '#222222',
   },
   fieldGroup: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.textSecondary,
-    marginBottom: 6,
+    marginBottom: 4,
     fontWeight: '500',
   },
   value: {
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333333',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 8,
     color: COLORS.textPrimary,
     fontSize: 14,
   },
@@ -421,9 +422,9 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: COLORS.accent,
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   saveButtonText: {
     color: '#FFFFFF',

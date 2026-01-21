@@ -11,7 +11,13 @@ from typing import Dict, List, Any
 
 def parse_nutrition_from_ifct(row: Dict[str, Any]) -> Dict[str, Any]:
     """Parse nutrition data from IFCT2017 CSV"""
-    nutrition = {}
+    nutrition = {
+        "calories": 0.0,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 0.0,
+        "fiber": 0.0
+    }
     try:
         if "Calories (kcal)" in row and row["Calories (kcal)"]:
             nutrition["calories"] = round(float(row["Calories (kcal)"]), 1)
@@ -33,7 +39,13 @@ def parse_nutrition_from_ifct(row: Dict[str, Any]) -> Dict[str, Any]:
 
 def parse_nutrition_from_healthy(row: Dict[str, Any]) -> Dict[str, Any]:
     """Parse nutrition data from Healthy Eating Dataset CSV"""
-    nutrition = {}
+    nutrition = {
+        "calories": 0.0,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 0.0,
+        "fiber": 0.0
+    }
     try:
         if "calories" in row and row["calories"]:
             nutrition["calories"] = round(float(row["calories"]), 1)

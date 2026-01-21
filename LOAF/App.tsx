@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View, ActivityIndicator } from 'react-native';
@@ -34,19 +34,21 @@ function TabIcon({ name, focused }: { name: keyof RootTabParamList; focused: boo
 }
 
 function MainNavigator() {
+  const insets = useSafeAreaInsets();
+  
   return (
     <Tab.Navigator
       id="BottomTabNavigator"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          height: 64,
+          height: 60 + insets.bottom,
           backgroundColor: COLORS.background,
           borderTopWidth: 1,
           borderTopColor: '#222222',
           elevation: 0,
           shadowOpacity: 0,
-          paddingBottom: 8,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
           paddingHorizontal: 0,
         },

@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 24,
   },
   center: {
     flex: 1,
@@ -140,10 +140,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 16,
+    marginTop: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '600',
     color: COLORS.textPrimary,
     marginBottom: 4,
@@ -154,44 +155,44 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#111111',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 14,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#222222',
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   metricBlock: {
-    marginBottom: 12,
+    marginBottom: 10,
   },
   metricHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   metricLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textPrimary,
   },
   metricValue: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textSecondary,
   },
   metricTarget: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.textSecondary,
     marginTop: 4,
   },
   progressBar: {
-    height: 8,
+    height: 6,
     backgroundColor: '#333333',
-    borderRadius: 4,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {

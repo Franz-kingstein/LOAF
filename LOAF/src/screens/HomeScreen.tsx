@@ -7,7 +7,10 @@ import {
   SafeAreaView,
   ActivityIndicator,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../context/ThemeContext';
 import { getTodayWaterTotal } from '../db/waterRepo';
 import { getTodaySummary } from '../db/summaryRepo';
@@ -15,6 +18,10 @@ import { getUserProfile } from '../db/userRepo';
 import { ensureFitnessPermissions, getTodayFitnessSummary, isAuthorized, GOOGLE_CLIENT_ID } from '../services/fitness';
 
 export function HomeScreen(): React.ReactElement {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<any>();
+  const { width } = Dimensions.get('window');
+
   const [loading, setLoading] = useState(true);
   const [todayWater, setTodayWater] = useState(0);
   const [todayNutrition, setTodayNutrition] = useState<any>(null);
@@ -82,8 +89,13 @@ export function HomeScreen(): React.ReactElement {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <ScrollView 
+        contentContainerStyle={[
+          styles.scrollContent, 
+          { paddingBottom: insets.bottom + 20 }
+        ]}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -185,15 +197,21 @@ export function HomeScreen(): React.ReactElement {
         {/* Quick Actions */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={() => navigation.navigate('LogFood')}
+          >
             <Text style={styles.actionButtonText}>📝 Log Food</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={() => navigation.navigate('Water')}
+          >
             <Text style={styles.actionButtonText}>💧 Log Water</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -202,46 +220,48 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
-    color: COLORS.textPrimary,
+    color: COLORS.textSecondary,
     marginTop: 12,
     fontSize: 14,
   },
+  scrollContent: {
+    paddingHorizontal: '5%',
+    paddingTop: 16,
+  },
   header: {
     marginBottom: 24,
+    marginTop: 8,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: COLORS.textPrimary,
-    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
+    marginTop: 4,
   },
   card: {
-    backgroundColor: '#111111',
+    backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    padding: 20,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: '#222222',
+    width: '100%',
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   cardTitle: {
     fontSize: 16,
@@ -258,7 +278,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333333',
     borderRadius: 5,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   cardBarFill: {
     height: '100%',
@@ -276,9 +296,9 @@ const styles = StyleSheet.create({
   nutritionItem: {
     width: '48%',
     backgroundColor: '#000000',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
     alignItems: 'center',
   },
   nutritionLabel: {
@@ -295,24 +315,24 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   actionButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 10,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.secondary,
   },
   actionButtonText: {
     color: COLORS.secondary,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
   },
 });

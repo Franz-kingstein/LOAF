@@ -1,4 +1,5 @@
 import foodDatabaseRaw from '../../data/foodDatabase.json';
+import { getAllCustomFoods } from '../db/customFoodRepo';
 
 export interface Food {
   id: string;
@@ -22,6 +23,40 @@ export interface Food {
 }
 
 let foodDatabase: Food[] | null = null;
+let cachedCustomFoods: Food[] = [];
+
+export async function loadFoodDataAsync(): Promise<Food[]> {
+  const baseFoods = (foodDatabaseRaw as any).foods || [];
+  
+  try {
+    const custom = await getAllCustomFoods();
+    cachedCustomFoods = custom.map(c => ({
+      id: c.id,
+      name: c.name,
+      category: 'CUSTOM',
+      aliases: [],
+      portionHints: { '1_serving': c.weight_grams },
+      nutrition: {
+        calories: c.calories,
+        protein: c.protein,
+        carbs: c.carbs,
+        fat: c.fat,
+        fiber: c.fiber,
+        iron: 0,
+        calcium: 0,
+        vitaminD_ug: 0
+      },
+      confidence: 1.0,
+      source: 'user_custom',
+      lastVerified: new Date().toISOString()
+    }));
+  } catch (e) {
+    console.warn('Could not load custom foods', e);
+  }
+
+  foodDatabase = [...baseFoods, ...cachedCustomFoods];
+  return foodDatabase;
+}
 
 export function loadFoodData(): Food[] {
   if (foodDatabase) return foodDatabase;

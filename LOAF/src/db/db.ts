@@ -49,6 +49,18 @@ async function createTables(): Promise<void> {
         created_at TEXT
       );
 
+      CREATE TABLE IF NOT EXISTS custom_foods (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        calories REAL,
+        protein REAL,
+        carbs REAL,
+        fat REAL,
+        fiber REAL,
+        weight_grams REAL,
+        created_at TEXT
+      );
+
       CREATE TABLE IF NOT EXISTS water_logs (
         id TEXT PRIMARY KEY,
         date TEXT NOT NULL,

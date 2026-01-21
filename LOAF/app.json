@@ -7,35 +7,51 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
-    "scheme": "LOAF",
+    "scheme": "loaf",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "Allow LOAF to access your microphone to log food."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "useAndroidX": true,
+            "enableJetifier": true
+          }
+        }
+      ]
     ],
     "splash": {
-      "image": "./assets/Logo.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#143109"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.loaf.app"
     },
     "android": {
       "package": "com.loaf.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "8de29483-c74d-47b7-bfd0-c8b2aa8fa9d4"
-  },
-  "geminiApiKey": "GEMINI_API_KEY_PLACEHOLDER"
+      },
+      "geminiApiKey": "GEMINI_API_KEY_PLACEHOLDER"
     }
   }
 }

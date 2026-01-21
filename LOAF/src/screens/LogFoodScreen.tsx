@@ -8,181 +8,422 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
 import { logMeal } from '../db/mealRepo';
+import { saveCustomFood } from '../db/customFoodRepo';
 import { getUserProfile } from '../db/userRepo';
 import { COLORS } from '../context/ThemeContext';
-
-const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
-};
-
-const RADIUS = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-};
-
-interface QuantityOption {
-  label: string;
-  multiplier: number;
-}
-
-const QUANTITY_OPTIONS: QuantityOption[] = [
-  { label: '0.5x', multiplier: 0.5 },
-  { label: '1x', multiplier: 1 },
-  { label: '2x', multiplier: 2 },
-];
+import { Food } from '../data/loadFoodData';
+import { FoodSearchInput } from '../components/FoodSearchInput';
+import { PortionPicker } from '../components/PortionPicker';
+import { calculateNutritionFromGrams, formatNutrition } from '../utils/nutritionCalculator';
+import { predictFoodFromImage, pickImage, takePhoto } from '../services/imageInference';
+import { findBestMatch } from '../services/foodMatcher';
+import { parseVoiceTranscript } from '../services/voiceParser';
 
 export function LogFoodScreen(): React.ReactElement {
   const insets = useSafeAreaInsets();
   
   // State
-  const [foodName, setFoodName] = useState('');
-  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [selectedPortionLabel, setSelectedPortionLabel] = useState<string>('');
+  const [portionGrams, setPortionGrams] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('snack');
+  const [isCustomMode, setIsCustomMode] = useState(false);
+  const [customFood, setCustomFood] = useState({
+    name: '',
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: '',
+    fiber: '',
+    weight: '100'
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  React.useEffect(() => {
+    Voice.onSpeechResults = onSpeechResults;
+    Voice.onSpeechError = (e: SpeechErrorEvent) => {
+      console.error(e);
+      setIsListening(false);
+    };
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onSpeechResults = (e: SpeechResultsEvent) => {
+    if (e.value && e.value.length > 0) {
+      const transcript = e.value[0];
+      const parsed = parseVoiceTranscript(transcript);
+      if (parsed && parsed.food) {
+        handleFoodSelect(parsed.food);
+        setQuantity(parsed.detectedQuantity || 1);
+        Alert.alert('Voice Detected', `Found: ${parsed.food.name}`);
+      } else {
+        Alert.alert('Not Found', `Couldn't identify food from: "${transcript}"`);
+      }
+    }
+    setIsListening(false);
+  };
+
+  const startListening = async () => {
+    try {
+      setIsListening(true);
+      await Voice.start('en-IN');
+    } catch (e) {
+      console.error(e);
+      setIsListening(false);
+    }
+  };
+
+  const stopListening = async () => {
+    try {
+      await Voice.stop();
+      setIsListening(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleFoodSelect = (food: Food) => {
+    setSelectedFood(food);
+    setIsCustomMode(false);
+    const firstPortion = Object.entries(food.portionHints)[0];
+    if (firstPortion) {
+      setSelectedPortionLabel(firstPortion[0]);
+      setPortionGrams(firstPortion[1]);
+    }
+  };
+
+  const handleImageInput = async (mode: 'camera' | 'library') => {
+    try {
+      const uri = mode === 'camera' ? await takePhoto() : await pickImage();
+      if (!uri) return;
+
+      setIsProcessingImage(true);
+      const predictions = await predictFoodFromImage(uri);
+      
+      if (predictions.length > 0) {
+        const topPrediction = predictions[0].label;
+        const match = findBestMatch(topPrediction);
+        
+        if (match && predictions[0].score > 0.6) {
+          handleFoodSelect(match);
+          Alert.alert('Matched Food', `Identified: ${match.name} (${Math.round(predictions[0].score * 100)}% confidence)`);
+        } else {
+          Alert.alert('Low Confidence', 'Could not reliably match image to database. Please search manually.');
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to process image');
+    } finally {
+      setIsProcessingImage(false);
+    }
+  };
+
+  const resetForm = () => {
+    setSelectedFood(null);
+    setQuantity(1);
+    setIsCustomMode(false);
+    setCustomFood({
+      name: '',
+      calories: '',
+      protein: '',
+      carbs: '',
+      fat: '',
+      fiber: '',
+      weight: '100'
+    });
+  };
 
   const handleSave = useCallback(async () => {
-    if (!foodName.trim()) {
-      Alert.alert('Error', 'Please enter a food name');
-      return;
-    }
-
-    if (selectedQuantity <= 0) {
-      Alert.alert('Error', 'Please select a valid quantity');
+    if (!selectedFood && !isCustomMode) {
+      Alert.alert('Error', 'Please select or enter a food');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const userProfile = await getUserProfile();
-      if (!userProfile) {
-        Alert.alert('Error', 'User profile not found. Please complete onboarding.');
-        setIsLoading(false);
-        return;
+      let mealEntry;
+
+      if (isCustomMode) {
+        if (!customFood.name || !customFood.calories) {
+          Alert.alert('Error', 'Please fill in food name and calories');
+          setIsLoading(false);
+          return;
+        }
+
+        const calories = parseFloat(customFood.calories) || 0;
+        const protein = parseFloat(customFood.protein) || 0;
+        const carbs = parseFloat(customFood.carbs) || 0;
+        const fat = parseFloat(customFood.fat) || 0;
+        const fiber = parseFloat(customFood.fiber) || 0;
+        const weight = parseFloat(customFood.weight) || 100;
+
+        // Permanent save to custom dictionary
+        const customId = await saveCustomFood({
+          name: customFood.name,
+          calories,
+          protein,
+          carbs,
+          fat,
+          fiber,
+          weight_grams: weight
+        });
+
+        mealEntry = {
+          date: new Date().toISOString().split('T')[0],
+          food_id: customId,
+          food_name: customFood.name,
+          meal_type: mealType,
+          portion_label: 'Custom serving',
+          portion_grams: weight,
+          quantity: 1,
+          total_grams: weight,
+          calories,
+          protein,
+          carbs,
+          fat,
+          fiber,
+          confidence: 1.0,
+          source: 'user_input',
+          timestamp: new Date().toISOString(),
+        };
+      } else if (selectedFood) {
+        const totalGrams = portionGrams * quantity;
+        const rawNutrition = calculateNutritionFromGrams(selectedFood, totalGrams);
+        const displayNutrition = formatNutrition(rawNutrition);
+
+        mealEntry = {
+          date: new Date().toISOString().split('T')[0],
+          food_id: selectedFood.id,
+          food_name: selectedFood.name,
+          meal_type: mealType,
+          portion_label: selectedPortionLabel,
+          portion_grams: portionGrams,
+          quantity: quantity,
+          total_grams: totalGrams,
+          ...displayNutrition,
+          confidence: selectedFood.confidence,
+          source: selectedFood.source,
+          timestamp: new Date().toISOString(),
+        };
       }
 
-      // Estimate basic nutrition (placeholder values until AI/database integration)
-      const baseCalories = 200;
-      const estimatedNutrition = {
-        date: new Date().toISOString().split('T')[0],
-        food_id: `manual_${Date.now()}`,
-        food_name: foodName.trim(),
-        portion_label: `${selectedQuantity}x`,
-        portion_grams: 100 * selectedQuantity,
-        calories: Math.round(baseCalories * selectedQuantity),
-        protein: Math.round(20 * selectedQuantity),
-        carbs: Math.round(25 * selectedQuantity),
-        fat: Math.round(7 * selectedQuantity),
-        fiber: Math.round(3 * selectedQuantity),
-        iron: Math.round(1.5 * selectedQuantity * 10) / 10,
-        calcium: Math.round(100 * selectedQuantity),
-        vitamin_d_ug: Math.round(1 * selectedQuantity * 10) / 10,
-      };
-
-      await logMeal(estimatedNutrition);
-
-      // Reset form
-      setFoodName('');
-      setSelectedQuantity(1);
-
-      Alert.alert('Success', `Logged "${foodName}" (${selectedQuantity}x portion)`);
+      if (mealEntry) {
+        await logMeal(mealEntry as any);
+        Alert.alert('Success', `Logged ${mealEntry.food_name} for ${mealType}`);
+        resetForm();
+      }
     } catch (error) {
       console.error('Error logging meal:', error);
-      Alert.alert('Error', 'Failed to save meal. Please try again.');
+      Alert.alert('Error', 'Failed to save meal.');
     } finally {
       setIsLoading(false);
     }
-  }, [foodName, selectedQuantity]);
+  }, [selectedFood, portionGrams, quantity, selectedPortionLabel, mealType, isCustomMode, customFood]);
+
+  const nutritionPreview = selectedFood ? formatNutrition(calculateNutritionFromGrams(selectedFood, portionGrams * quantity)) : null;
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-    >
-      <View style={styles.content}>
-        {/* Header */}
-        <Text style={styles.header}>Log Your Meal</Text>
-
-        {/* Food Name Input */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Food Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter food or meal name"
-            placeholderTextColor={COLORS.textSecondary}
-            value={foodName}
-            onChangeText={setFoodName}
-            editable={!isLoading}
-          />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Log Food</Text>
+          <TouchableOpacity 
+            onPress={() => {
+              setIsCustomMode(!isCustomMode);
+              setSelectedFood(null);
+            }}
+            style={[styles.customToggle, isCustomMode && styles.customToggleActive]}
+          >
+            <Text style={styles.customToggleText}>{isCustomMode ? 'Search Mode' : '+ Custom'}</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Quantity Selector */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Portion Size</Text>
-          <View style={styles.quantityContainer}>
-            {QUANTITY_OPTIONS.map((option) => (
+        {/* Meal Type Selector */}
+        <View style={styles.mealTypeSection}>
+          <Text style={styles.label}>When are you eating?</Text>
+          <View style={styles.mealTypeGrid}>
+            {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
               <TouchableOpacity
-                key={option.multiplier}
-                style={[
-                  styles.quantityButton,
-                  selectedQuantity === option.multiplier &&
-                    styles.quantityButtonActive,
-                ]}
-                onPress={() => setSelectedQuantity(option.multiplier)}
-                disabled={isLoading}
+                key={type}
+                onPress={() => setMealType(type as any)}
+                style={[styles.mealTypeBtn, mealType === type && styles.mealTypeBtnActive]}
               >
-                <Text
-                  style={[
-                    styles.quantityButtonText,
-                    selectedQuantity === option.multiplier &&
-                      styles.quantityButtonTextActive,
-                  ]}
-                >
-                  {option.label}
+                <Text style={[styles.mealTypeBtnText, mealType === type && styles.mealTypeBtnActiveText]}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
+        
+        {!isCustomMode ? (
+          <>
+            <View style={styles.cameraActions}>
+              <TouchableOpacity style={styles.iconButton} onPress={() => handleImageInput('camera')}>
+                <Text style={styles.buttonTextSmall}>📸 Camera</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.iconButton, isListening && { backgroundColor: COLORS.accent }]} 
+                onPress={isListening ? stopListening : startListening}
+              >
+                <Text style={styles.buttonTextSmall}>
+                  {isListening ? '🛑 Stop' : '🎙️ Voice'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-        {/* Display selected quantity info */}
-        <View style={styles.infoBox}>
-          <Text style={styles.infoText}>
-            {selectedQuantity === 1
-              ? '1x serving'
-              : selectedQuantity === 0.5
-                ? 'Half serving'
-                : `${selectedQuantity}x serving`}
-          </Text>
-        </View>
+            <FoodSearchInput onSelect={handleFoodSelect} />
 
-        {/* Save Button */}
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            isLoading && styles.saveButtonDisabled,
-          ]}
-          onPress={handleSave}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={COLORS.textPrimary} />
-          ) : (
-            <Text style={styles.saveButtonText}>Save Meal</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+            {isProcessingImage && <ActivityIndicator color={COLORS.primary} size="large" style={{ marginTop: 20 }} />}
+
+            {selectedFood && (
+              <View style={styles.detailsCard}>
+                <Text style={styles.foodName}>{selectedFood.name}</Text>
+                
+                <PortionPicker 
+                  options={Object.entries(selectedFood.portionHints).map(([label, grams]) => ({ label, grams }))}
+                  selectedLabel={selectedPortionLabel}
+                  onSelect={(opt) => {
+                    setSelectedPortionLabel(opt.label);
+                    setPortionGrams(opt.grams);
+                  }}
+                />
+
+                <View style={styles.section}>
+                  <Text style={styles.label}>Quantity</Text>
+                  <View style={styles.quantitySelector}>
+                    <TouchableOpacity onPress={() => setQuantity(Math.max(0.5, quantity - 0.5))} style={styles.qBtn}><Text style={styles.qBtnText}>-</Text></TouchableOpacity>
+                    <Text style={styles.quantityText}>{quantity}x</Text>
+                    <TouchableOpacity onPress={() => setQuantity(quantity + 0.5)} style={styles.qBtn}><Text style={styles.qBtnText}>+</Text></TouchableOpacity>
+                  </View>
+                </View>
+
+                {nutritionPreview && (
+                  <View style={styles.nutritionBox}>
+                    <Text style={styles.nutritionTitle}>Nutrition Summary ({portionGrams * quantity}g)</Text>
+                    <View style={styles.nutritionGrid}>
+                      <Text style={styles.nutrient}>Cal: {nutritionPreview.calories}</Text>
+                      <Text style={styles.nutrient}>Prot: {nutritionPreview.protein}g</Text>
+                      <Text style={styles.nutrient}>Carbs: {nutritionPreview.carbs}g</Text>
+                      <Text style={styles.nutrient}>Fat: {nutritionPreview.fat}g</Text>
+                    </View>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  style={[styles.saveButton, isLoading && styles.disabledButton]}
+                  onPress={handleSave}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color={COLORS.textPrimary} />
+                  ) : (
+                    <Text style={styles.saveButtonText}>Add to Meal Log</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          </>
+        ) : (
+          <View style={styles.detailsCard}>
+            <Text style={styles.foodName}>Custom Food Entry</Text>
+            
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Food Name</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. Grandma's Secret Stew"
+                placeholderTextColor={COLORS.textSecondary}
+                value={customFood.name}
+                onChangeText={(t) => setCustomFood({ ...customFood, name: t })}
+              />
+            </View>
+
+            <View style={styles.nutritionInputGrid}>
+              <View style={styles.inputGroupFull}>
+                <Text style={styles.inputLabel}>Calories (kcal)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={customFood.calories}
+                  onChangeText={(t) => setCustomFood({ ...customFood, calories: t })}
+                />
+              </View>
+              
+              <View style={styles.inputGroupHalf}>
+                <Text style={styles.inputLabel}>Protein (g)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={customFood.protein}
+                  onChangeText={(t) => setCustomFood({ ...customFood, protein: t })}
+                />
+              </View>
+              <View style={styles.inputGroupHalf}>
+                <Text style={styles.inputLabel}>Carbs (g)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={customFood.carbs}
+                  onChangeText={(t) => setCustomFood({ ...customFood, carbs: t })}
+                />
+              </View>
+              <View style={styles.inputGroupHalf}>
+                <Text style={styles.inputLabel}>Fat (g)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  placeholder="0"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={customFood.fat}
+                  onChangeText={(t) => setCustomFood({ ...customFood, fat: t })}
+                />
+              </View>
+              <View style={styles.inputGroupHalf}>
+                <Text style={styles.inputLabel}>Weight (g)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType="numeric"
+                  placeholder="100"
+                  placeholderTextColor={COLORS.textSecondary}
+                  value={customFood.weight}
+                  onChangeText={(t) => setCustomFood({ ...customFood, weight: t })}
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.saveButton, isLoading && styles.disabledButton]}
+              onPress={handleSave}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={COLORS.textPrimary} />
+              ) : (
+                <Text style={styles.saveButtonText}>Save Custom Meal</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -192,93 +433,199 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   content: {
-    flex: 1,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.xl,
-    justifyContent: 'space-between',
+    paddingHorizontal: '5%',
+    paddingTop: 16,
   },
-  header: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-    marginBottom: SPACING.xl,
-    textAlign: 'center',
-  },
-  section: {
-    marginBottom: SPACING.xl,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  input: {
-    backgroundColor: COLORS.inputBackground,
-    borderColor: COLORS.inputBorder,
-    borderWidth: 1,
-    borderRadius: RADIUS.md,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    fontSize: 16,
-    color: COLORS.textPrimary,
-    fontFamily: 'System',
-  },
-  quantityContainer: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: SPACING.md,
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  quantityButton: {
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
+  customToggle: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  customToggleActive: {
+    backgroundColor: COLORS.accent,
+  },
+  customToggleText: {
+    color: COLORS.textPrimary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  mealTypeSection: {
+    marginBottom: 20,
+  },
+  mealTypeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  mealTypeBtn: {
     flex: 1,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.md,
-    borderColor: COLORS.inputBorder,
-    borderWidth: 1,
+    minWidth: '45%',
     backgroundColor: COLORS.cardBackground,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#222222',
+  },
+  mealTypeBtnActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.secondary,
+  },
+  mealTypeBtnText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  mealTypeBtnActiveText: {
+    color: COLORS.textPrimary,
+  },
+  cameraActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    gap: 16,
+  },
+  iconButton: {
+    flex: 1,
+    backgroundColor: COLORS.cardBackground,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#222222',
+  },
+  buttonTextSmall: {
+    color: COLORS.textPrimary,
+    fontSize: 14,
+  },
+  detailsCard: {
+    marginTop: 20,
+    backgroundColor: COLORS.cardBackground,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#222222',
+  },
+  foodName: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginBottom: 16,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  label: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  quantitySelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.cardBackground,
+    padding: 12,
+    borderRadius: 12,
+  },
+  qBtn: {
+    backgroundColor: COLORS.primary,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  quantityButtonActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+  qBtnText: {
+    color: COLORS.textPrimary,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  quantityButtonText: {
-    fontSize: 14,
+  quantityText: {
+    color: COLORS.textPrimary,
+    fontSize: 16,
     fontWeight: '600',
+  },
+  nutritionBox: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  nutritionTitle: {
     color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textTransform: 'uppercase',
   },
-  quantityButtonTextActive: {
-    color: COLORS.secondary,
+  nutritionGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
-  infoBox: {
-    backgroundColor: COLORS.cardBackground,
-    borderColor: COLORS.inputBorder,
-    borderWidth: 1,
-    borderRadius: RADIUS.md,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.xl,
-  },
-  infoText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
+  nutrient: {
+    color: COLORS.textPrimary,
+    fontSize: 13,
   },
   saveButton: {
     backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.lg,
-    borderRadius: RADIUS.md,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveButtonDisabled: {
-    opacity: 0.6,
+    marginTop: 8,
   },
   saveButtonText: {
+    color: COLORS.textPrimary,
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.secondary,
+    fontWeight: 'bold',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  nutritionInputGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  inputGroupFull: {
+    width: '100%',
+    marginBottom: 12,
+  },
+  inputGroupHalf: {
+    width: '48%',
+    marginBottom: 12,
+  },
+  inputLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    marginBottom: 6,
+  },
+  textInput: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: '#333333',
+    borderRadius: 8,
+    padding: 10,
+    color: COLORS.textPrimary,
+    fontSize: 14,
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });

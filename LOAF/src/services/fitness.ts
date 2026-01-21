@@ -19,13 +19,9 @@ const GOOGLE_FIT_SCOPES = [
 ];
 
 // OAuth Client ID configured via app.json -> expo.extra.googleOAuthClientId
-// Fallback to a hardcoded ID if not provided (replace with your own client ID)
-export const GOOGLE_CLIENT_ID =
-  (Constants?.expoConfig as any)?.extra?.googleOAuthClientId ||
-  '229104397794-difor30551b64fqnf50e4jgv63vglhs8.apps.googleusercontent.com';
+export const GOOGLE_CLIENT_ID = '229104397794-difor30551b64fqnf50e4jgv63vglhs8.apps.googleusercontent.com';
 
 // NOTE: You will need to provide a webClientId (OAuth client) from Google Cloud Console.
-// For now, we request using prompt; caller can pass client IDs.
 export async function ensureFitnessPermissions(): Promise<boolean> {
   try {
     const discovery = {
@@ -33,11 +29,10 @@ export async function ensureFitnessPermissions(): Promise<boolean> {
       tokenEndpoint: 'https://oauth2.googleapis.com/token',
     };
 
-    // Use OAuth Code + PKCE (recommended) and explicit redirect URI tied to app scheme.
     const request = new AuthSession.AuthRequest({
       clientId: GOOGLE_CLIENT_ID,
       scopes: GOOGLE_FIT_SCOPES,
-      redirectUri: AuthSession.makeRedirectUri(),
+      redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
       responseType: AuthSession.ResponseType.Code,
       usePKCE: true,
       extraParams: {
@@ -47,7 +42,7 @@ export async function ensureFitnessPermissions(): Promise<boolean> {
     });
 
     await request.makeAuthUrlAsync(discovery);
-    const result = await request.promptAsync(discovery);
+    const result = await request.promptAsync(discovery, { useProxy: true });
 
     if (result.type === 'success') {
       // Exchange the code for tokens
