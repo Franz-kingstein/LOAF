@@ -29,10 +29,12 @@ export async function ensureFitnessPermissions(): Promise<boolean> {
       tokenEndpoint: 'https://oauth2.googleapis.com/token',
     };
 
+    const redirectUri = AuthSession.makeRedirectUri();
+    
     const request = new AuthSession.AuthRequest({
       clientId: GOOGLE_CLIENT_ID,
       scopes: GOOGLE_FIT_SCOPES,
-      redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
+      redirectUri: redirectUri,
       responseType: AuthSession.ResponseType.Code,
       usePKCE: true,
       extraParams: {
@@ -42,7 +44,7 @@ export async function ensureFitnessPermissions(): Promise<boolean> {
     });
 
     await request.makeAuthUrlAsync(discovery);
-    const result = await request.promptAsync(discovery, { useProxy: true });
+    const result = await request.promptAsync(discovery);
 
     if (result.type === 'success') {
       // Exchange the code for tokens

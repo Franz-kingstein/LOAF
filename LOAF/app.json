@@ -10,6 +10,7 @@
     "scheme": "loaf",
     "plugins": [
       "expo-router",
+      "./withAndroidXGradleConfig",
       [
         "@react-native-voice/voice",
         {
@@ -23,7 +24,8 @@
             "useAndroidX": true,
             "enableJetifier": true,
             "extraMavenRepos": [
-              "https://www.jitpack.io"
+              "https://www.jitpack.io",
+              "https://maven.google.com"
             ],
             "gradleProperties": {
               "android.useAndroidX": "true",
