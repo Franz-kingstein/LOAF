@@ -21,7 +21,10 @@
         {
           "android": {
             "useAndroidX": true,
-            "enableJetifier": true
+            "enableJetifier": true,
+            "extraMavenRepos": [
+              "https://www.jitpack.io"
+            ]
           }
         }
       ]
