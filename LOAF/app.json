@@ -26,15 +26,10 @@
             "extraMavenRepos": [
               "https://www.jitpack.io",
               "https://maven.google.com"
-            ],
-            "gradleProperties": {
-              "android.useAndroidX": "true",
-              "android.enableJetifier": "true"
-            }
+            ]
           }
         }
-      ],
-      "./plugins/resolve-androidx-conflict.js"
+      ]
     ],
     "splash": {
       "image": "./assets/icon.png",
