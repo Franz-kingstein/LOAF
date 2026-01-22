@@ -24,10 +24,15 @@
             "enableJetifier": true,
             "extraMavenRepos": [
               "https://www.jitpack.io"
-            ]
+            ],
+            "gradleProperties": {
+              "android.useAndroidX": "true",
+              "android.enableJetifier": "true"
+            }
           }
         }
-      ]
+      ],
+      "./plugins/resolve-androidx-conflict.js"
     ],
     "splash": {
       "image": "./assets/icon.png",
