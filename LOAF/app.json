@@ -11,12 +11,6 @@
     "plugins": [
       "./withAndroidXGradleConfig",
       [
-        "@react-native-voice/voice",
-        {
-          "microphonePermission": "Allow LOAF to access your microphone to log food."
-        }
-      ],
-      [
         "expo-build-properties",
         {
           "android": {
