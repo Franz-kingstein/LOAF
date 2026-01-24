@@ -7,6 +7,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '../src/constants/theme';
 
 // Import screens
@@ -22,35 +23,31 @@ import { TAB_SCREENS, getTabScreenOptions } from './NavigationConfig';
 const Tab = createBottomTabNavigator();
 
 /**
- * Emoji Icon Map for Tab Navigation
- * Simple emoji icons - no library dependencies
+ * Vector Icon Map for Tab Navigation
+ * Maps tab names to Ionicons
  */
-const EMOJI_MAP: Record<string, string> = {
-  'home': '🏠',
-  'utensils': '🍽️',
-  'tint': '💧',
-  'chart-line': '📊',
-  'cog': '⚙️',
+const ICON_MAP: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'home': 'home',
+  'utensils': 'restaurant',
+  'tint': 'water',
+  'chart-line': 'stats-chart',
+  'cog': 'settings',
 };
 
 /**
- * Get Emoji Icon for Tab
- * Returns the appropriate emoji based on tab name
+ * Get Vector Icon for Tab
+ * Returns the appropriate Ionicons icon based on tab name
  */
 const getTabIcon = (name: string, color: string, size: number) => {
   const iconName = TAB_SCREENS[name as keyof typeof TAB_SCREENS]?.icon || 'help';
-  const emoji = EMOJI_MAP[iconName] || '•';
+  const vectorIcon = ICON_MAP[iconName] || 'help-circle';
   return (
-    <Text 
-      style={{ 
-        fontSize: 28,
-        color: color,
-        marginBottom: spacing.sm,
-        lineHeight: 28,
-      }}
-    >
-      {emoji}
-    </Text>
+    <Ionicons 
+      name={vectorIcon} 
+      size={size} 
+      color={color} 
+      style={{ marginBottom: spacing.sm }}
+    />
   );
 };
 

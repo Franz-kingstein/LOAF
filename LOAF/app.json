@@ -4,12 +4,11 @@
     "slug": "LOAF",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Logo.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": false,
     "scheme": "loaf",
     "plugins": [
-      "expo-router",
       "./withAndroidXGradleConfig",
       [
         "@react-native-voice/voice",
@@ -32,7 +31,7 @@
       ]
     ],
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#143109"
     },
@@ -43,16 +42,15 @@
     "android": {
       "package": "com.loaf.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/Logo.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/icon.png"
+      "favicon": "./assets/Logo.png"
     },
     "extra": {
-      "router": {},
       "eas": {
         "projectId": "8de29483-c74d-47b7-bfd0-c8b2aa8fa9d4"
       },

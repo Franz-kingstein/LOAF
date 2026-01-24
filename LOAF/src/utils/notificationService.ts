@@ -12,6 +12,8 @@ export async function configureNotificationHandler(): Promise<void> {
       shouldShowAlert: true,
       shouldPlaySound: true,
       shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
     }),
   });
 
@@ -29,7 +31,6 @@ export async function requestNotificationPermissions(): Promise<boolean> {
         allowAlert: true,
         allowBadge: true,
         allowSound: true,
-        allowAnnouncements: false,
         allowCriticalAlerts: false,
       },
     });
@@ -177,6 +178,7 @@ export async function scheduleWaterReminders(): Promise<void> {
             },
           },
           trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
             seconds: secondsUntilTrigger,
             repeats: true, // Repeats daily
           },
@@ -212,7 +214,10 @@ export async function sendImmediateWaterReminder(): Promise<void> {
           timestamp: new Date().toISOString(),
         },
       },
-      trigger: { seconds: 1 }, // Send immediately
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 1,
+      }, // Send immediately
     });
   } catch (error) {
     console.error('Error sending immediate water reminder:', error);

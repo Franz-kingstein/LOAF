@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
+import { Ionicons } from '@expo/vector-icons';
 import { logMeal } from '../db/mealRepo';
 import { saveCustomFood } from '../db/customFoodRepo';
 import { getUserProfile } from '../db/userRepo';
@@ -22,7 +22,6 @@ import { PortionPicker } from '../components/PortionPicker';
 import { calculateNutritionFromGrams, formatNutrition } from '../utils/nutritionCalculator';
 import { predictFoodFromImage, pickImage, takePhoto } from '../services/imageInference';
 import { findBestMatch } from '../services/foodMatcher';
-import { parseVoiceTranscript } from '../services/voiceParser';
 
 export function LogFoodScreen(): React.ReactElement {
   const insets = useSafeAreaInsets();
@@ -45,52 +44,6 @@ export function LogFoodScreen(): React.ReactElement {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingImage, setIsProcessingImage] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-
-  React.useEffect(() => {
-    Voice.onSpeechResults = onSpeechResults;
-    Voice.onSpeechError = (e: SpeechErrorEvent) => {
-      console.error(e);
-      setIsListening(false);
-    };
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
-
-  const onSpeechResults = (e: SpeechResultsEvent) => {
-    if (e.value && e.value.length > 0) {
-      const transcript = e.value[0];
-      const parsed = parseVoiceTranscript(transcript);
-      if (parsed && parsed.food) {
-        handleFoodSelect(parsed.food);
-        setQuantity(parsed.detectedQuantity || 1);
-        Alert.alert('Voice Detected', `Found: ${parsed.food.name}`);
-      } else {
-        Alert.alert('Not Found', `Couldn't identify food from: "${transcript}"`);
-      }
-    }
-    setIsListening(false);
-  };
-
-  const startListening = async () => {
-    try {
-      setIsListening(true);
-      await Voice.start('en-IN');
-    } catch (e) {
-      console.error(e);
-      setIsListening(false);
-    }
-  };
-
-  const stopListening = async () => {
-    try {
-      await Voice.stop();
-      setIsListening(false);
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleFoodSelect = (food: Food) => {
     setSelectedFood(food);
@@ -271,15 +224,10 @@ export function LogFoodScreen(): React.ReactElement {
           <>
             <View style={styles.cameraActions}>
               <TouchableOpacity style={styles.iconButton} onPress={() => handleImageInput('camera')}>
-                <Text style={styles.buttonTextSmall}>📸 Camera</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.iconButton, isListening && { backgroundColor: COLORS.accent }]} 
-                onPress={isListening ? stopListening : startListening}
-              >
-                <Text style={styles.buttonTextSmall}>
-                  {isListening ? '🛑 Stop' : '🎙️ Voice'}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="camera" size={16} color={COLORS.secondary} style={{ marginRight: 4 }} />
+                  <Text style={styles.buttonTextSmall}>Camera</Text>
+                </View>
               </TouchableOpacity>
             </View>
 

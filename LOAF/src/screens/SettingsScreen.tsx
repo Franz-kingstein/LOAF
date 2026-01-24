@@ -10,6 +10,7 @@ import {
   Alert,
   Switch,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../context/ThemeContext';
 import { getUserProfile, updateUserProfile } from '../db/userRepo';
 import {
@@ -83,7 +84,10 @@ export function SettingsScreen(): React.ReactElement {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>⚙️ Settings</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="settings" size={24} color={COLORS.accent} style={{ marginRight: 12 }} />
+            <Text style={styles.title}>Settings</Text>
+          </View>
           <Text style={styles.subtitle}>Manage your preferences</Text>
         </View>
 
@@ -219,7 +223,10 @@ export function SettingsScreen(): React.ReactElement {
         {waterPrefs && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>💧 Water Settings</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="water" size={18} color={COLORS.accent} style={{ marginRight: 8 }} />
+                <Text style={styles.sectionTitle}>Water Settings</Text>
+              </View>
               <TouchableOpacity
                 onPress={() => setEditingWater(!editingWater)}
                 style={styles.editButton}

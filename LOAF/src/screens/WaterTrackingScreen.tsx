@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.secondary,
   },
   quickAddButtonText: {
-    color: COLORS.secondary,
+    color: 'white',
     fontSize: 14,
     fontWeight: '600',
   },
