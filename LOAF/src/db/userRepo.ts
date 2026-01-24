@@ -1,4 +1,5 @@
 import { getDatabase } from './db';
+import { supabase } from '../utils/supabase';
 
 function generateId(): string {
   // simple unique id generator (timestamp + random)
@@ -81,4 +82,21 @@ export async function updateUserProfile(data: Partial<Omit<UserProfile, 'id' | '
     `UPDATE user_profile SET ${updates.join(', ')} LIMIT 1`,
     values
   );
+}
+
+// Supabase sync functions for backup (optional, since profile is user-specific)
+export async function syncUserProfileToSupabase(userId: string): Promise<void> {
+  try {
+    const profile = await getUserProfile();
+    if (profile) {
+      // Note: Supabase doesn't have a users table for profile, but we can add one if needed
+      // For now, skip or add a profiles table
+    }
+  } catch (error) {
+    console.error('Error syncing user profile to Supabase:', error);
+  }
+}
+
+export async function loadUserProfileFromSupabase(userId: string): Promise<void> {
+  // Implement if needed
 }

@@ -1,5 +1,6 @@
 import { getDatabase } from './db';
 import { generateId, todayDate } from '../utils/helpers';
+import { supabase } from '../utils/supabase';
 
 export interface WaterLog {
   id: string;
@@ -47,4 +48,44 @@ export async function getTodayWaterTotal(): Promise<number> {
 export async function deleteWaterLog(id: string): Promise<void> {
   const db = getDatabase();
   await db.runAsync('DELETE FROM water_logs WHERE id = ?', [id]);
+}
+
+// Supabase sync functions for backup
+export async function syncWaterLogsToSupabase(userId: string): Promise<void> {
+  try {
+    const db = getDatabase();
+    const logs = await db.getAllAsync<WaterLog>('SELECT * FROM water_logs');
+    for (const log of logs) {
+      await supabase.from('water_logs').upsert({
+        id: log.id,
+        user_id: userId,
+        amount: log.amount_ml,
+        date: log.date,
+        created_at: log.created_at,
+      });
+    }
+  } catch (error) {
+    console.error('Error syncing water logs to Supabase:', error);
+  }
+}
+
+export async function loadWaterLogsFromSupabase(userId: string): Promise<void> {
+  try {
+    const { data } = await supabase.from('water_logs').select('*').eq('user_id', userId);
+    if (data) {
+      const db = getDatabase();
+      for (const log of data) {
+        const existing = await db.getFirstAsync('SELECT id FROM water_logs WHERE id = ?', [log.id]);
+        if (!existing) {
+          await db.runAsync(
+            `INSERT INTO water_logs (id, date, amount_ml, created_at)
+             VALUES (?, ?, ?, ?)`,
+            [log.id, log.date, log.amount, log.created_at]
+          );
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error loading water logs from Supabase:', error);
+  }
 }

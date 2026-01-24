@@ -1,12 +1,13 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
+import { syncAllDataToSupabase } from './syncService';
 
 WebBrowser.maybeCompleteAuthSession();
 
 type GoogleAuthState = {
   accessToken?: string;
   expiresAt?: number;
-  user?: { email?: string; name?: string };
+  user?: { id?: string; email?: string; name?: string };
 };
 
 let inMemoryState: GoogleAuthState | null = null;
@@ -20,6 +21,27 @@ export async function getAuthState(): Promise<GoogleAuthState | null> {
 
 export async function signOutGoogle(): Promise<void> {
   inMemoryState = null;
+}
+
+async function getUserInfo(accessToken: string): Promise<{ id: string; email: string; name: string } | null> {
+  try {
+    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (response.ok) {
+      const userInfo = await response.json();
+      return {
+        id: userInfo.id,
+        email: userInfo.email,
+        name: userInfo.name,
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+  }
+  return null;
 }
 
 export async function signInWithGoogle(): Promise<GoogleAuthState | null> {
@@ -49,10 +71,18 @@ export async function signInWithGoogle(): Promise<GoogleAuthState | null> {
       }
 
       if (params.access_token) {
+        const userInfo = await getUserInfo(params.access_token);
         inMemoryState = {
           accessToken: params.access_token,
           expiresAt: params.expires_in ? Date.now() + parseInt(params.expires_in) * 1000 : undefined,
+          user: userInfo || undefined,
         };
+
+        // Sync data to Supabase as backup
+        if (userInfo?.id) {
+          await syncAllDataToSupabase(userInfo.id);
+        }
+
         return inMemoryState;
       }
     }

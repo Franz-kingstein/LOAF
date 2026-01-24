@@ -1,5 +1,6 @@
 import { getDatabase } from './db';
 import { generateId } from '../utils/helpers';
+import { supabase } from '../utils/supabase';
 
 export interface WaterTrackingPreferences {
   id: string;
@@ -135,4 +136,46 @@ export async function toggleReminders(enabled: boolean): Promise<void> {
 export async function areRemindersEnabled(): Promise<boolean> {
   const prefs = await getOrCreateWaterPreferences();
   return prefs.reminders_enabled;
+}
+
+// Supabase sync functions for backup
+export async function syncWaterPreferencesToSupabase(userId: string): Promise<void> {
+  try {
+    const prefs = await getOrCreateWaterPreferences();
+    await supabase.from('water_preferences').upsert({
+      id: prefs.id,
+      user_id: userId,
+      daily_goal: prefs.daily_goal_ml,
+      unit: 'ml',
+      created_at: prefs.created_at,
+      updated_at: prefs.updated_at,
+    });
+  } catch (error) {
+    console.error('Error syncing water preferences to Supabase:', error);
+  }
+}
+
+export async function loadWaterPreferencesFromSupabase(userId: string): Promise<void> {
+  try {
+    const { data } = await supabase.from('water_preferences').select('*').eq('user_id', userId).single();
+    if (data) {
+      const db = getDatabase();
+      const existing = await db.getFirstAsync('SELECT id FROM water_tracking_preferences LIMIT 1');
+      if (!existing) {
+        await db.runAsync(
+          `INSERT INTO water_tracking_preferences 
+           (id, daily_goal_ml, wake_up_time, sleep_time, reminder_interval_minutes, reminders_enabled, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [data.id, data.daily_goal, '06:00', '22:00', 120, 1, data.created_at, data.updated_at]
+        );
+      } else {
+        await db.runAsync(
+          `UPDATE water_tracking_preferences SET daily_goal_ml = ?, updated_at = ?`,
+          [data.daily_goal, data.updated_at]
+        );
+      }
+    }
+  } catch (error) {
+    console.error('Error loading water preferences from Supabase:', error);
+  }
 }
